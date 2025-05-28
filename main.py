@@ -1,36 +1,24 @@
-import dearpygui.dearpygui as dpg
+import customtkinter as ctk
 
-# Format for button callbacks is button name, then callback
-def open_configuration_callback():
-    dpg.show_item("file_dialog_id")
-    
-# Triggered when the user selects a file in the Explorer dialog
-def file_dialog_callback(sender, app_data):
-    path = app_data['file_path_name']
-    print(path)
+class App(ctk.CTk):
+    def __init__(self):
+        # Initializes window and sets attributes
+        super().__init__()
+        self.geometry("200x150")
+        self.title("Lemon")
+        
+        # Gives the columns more "weight", spacing them out (kind of like an HBox?)
+        for i in range(4):
+            self.grid_columnconfigure(i, weight=1)
 
-# ImGui Initialization
-dpg.create_context()
-dpg.create_viewport(title="Lemon", width=400, height=250, clear_color=(240, 240, 240, 255))
-dpg.setup_dearpygui()
+        # Standardized name: function_button
+        self.open_button = ctk.CTkButton(self, text="Open Configuration", command=self.open_button_handler)
+        self.open_button.grid(row=0, column=2, padx=20, pady=10)
 
-# Adds font to ImGui
-with dpg.font_registry():
-    default_font = dpg.add_font("./Roboto-Regular.ttf", 20)
-    
-# Initializes main Lemon window
-with dpg.window(label="Lemon", no_title_bar=True, pos=(0, 0), width=400, height=250, no_move=True):
-    dpg.bind_font(default_font) # Sets the Roboto Regular font
-    
-    # Adds Open Config button and shows the file dialog by calling the callback function
-    dpg.add_button(label="Open Configuration", callback=open_configuration_callback)
-    
-    dpg.add_file_dialog(
-        directory_selector=True, show=False, callback=file_dialog_callback, 
-        tag="file_dialog_id", width=700 ,height=400
-    )
+    # Note the standardized name: button_name_handler
+    def open_button_handler(self):
+        print("button click")
 
-# Starts display main loop
-dpg.show_viewport()
-dpg.start_dearpygui()
-dpg.destroy_context()
+
+app = App()
+app.mainloop()
