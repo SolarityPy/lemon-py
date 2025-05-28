@@ -1,5 +1,6 @@
 import customtkinter as ctk
 from ConfigParser import ConfigParser
+from Translator import Translator
 from tkinter import filedialog
 
 class App(ctk.CTk):
@@ -29,7 +30,7 @@ class App(ctk.CTk):
             config = ConfigParser(file_path)
             config_dictionary = config.parse()
             
-            
+            translator_object = Translator(config_dictionary)
 
 
 # Initializes main loop
