@@ -1,4 +1,6 @@
 import customtkinter as ctk
+from ConfigParser import ConfigParser
+from tkinter import filedialog
 
 class App(ctk.CTk):
     def __init__(self):
@@ -17,8 +19,19 @@ class App(ctk.CTk):
 
     # Note the standardized name: button_name_handler
     def open_button_handler(self):
-        print("button click")
+        # Limits the extensions to .conf, .txt, and .toml
+        file_path = filedialog.askopenfilename(
+            filetypes=[("Config files", "*.conf"), ("Text files", "*.txt"), ("TOML files", "*.toml")]
+        )
+        
+        # Only proceeds if file is chosen
+        if file_path:
+            config = ConfigParser(file_path)
+            config_dictionary = config.parse()
+            
+            
 
 
+# Initializes main loop
 app = App()
 app.mainloop()
