@@ -31,6 +31,7 @@ class App(ctk.CTk):
             config_dictionary = config.parse()
             
             translator_object = Translator(config_dictionary)
+            translator_object.translate()
 
 
 # Initializes main loop
