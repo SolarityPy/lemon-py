@@ -1,14 +1,52 @@
 class Translator:
     
     def __init__(self, config_dictionary):
-        self.config_dictionary = config_dictionary
-        self.commands_list = []
+        self.config_dictionary = config_dictionary 
+        self.commands_list = [] #I was thinking and I was imagining that we just add the commands to list and then run them in the exe - might have been the original idea tho
     
     def translate(self):
         for check in self.config_dictionary['check']:
             for check_pass in check['pass']:
                 if check_pass['type'] == "FirewallUp":
-                    # why not just interate though and call a method based on the type
-                    # u gotta remember that this is going to an exe you can't just call it on the host machine
-                    # so we'll have a base exe script that somehow we pass in params to like idk lets work
-                    self.config_dictionary.append("") # you can just iterate through list and run everything
+                    self.commands_list.append("")
+
+
+
+
+
+
+
+#thought we might these real soon
+'''
+CommandContains:      ["cmd", "value"]
+CommandOutput:        ["cmd", "value"]
+DirContains:          ["path", "value"]
+FileContains:         ["path", "value"]
+FileEquals:           ["path", "value"]
+FileOwner:            ["path", "name"]
+FirewallUp:           []
+PathExists:           ["path"]
+ProgramInstalled:     ["name"]
+ProgramVersion:       ["name", "value"]
+ServiceUp:            ["name"]
+UserExists:           ["name"]
+UserInGroup:          ["user", "group"]
+PasswordChanged:          ["user", "value"]
+PermissionIs:             ["path", "value"]
+AutoCheckUpdatesEnabled:  []
+Command:                  ["cmd"]
+GuestDisabledLDM:         []
+KernelVersion:            ["value"]
+PasswordChanged:          ["user", "after"]
+PermissionIs:             ["path", "name", "value"]
+BitlockerEnabled:         []
+FirewallDefaultBehavior:  ["name", "value", "key"]
+RegistryKeyExists:        ["key"]
+ScheduledTaskExists:      ["name"]
+SecurityPolicy:           ["key", "value"]
+ServiceStartup:           ["name", "value"]
+ShareExists:              ["name"]
+UserDetail:               ["user", "key", "value"]
+UserRights:               ["name", "value"]
+WindowsFeature:           ["name"]
+'''
