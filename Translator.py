@@ -1,7 +1,7 @@
 import json
+from Security import Security
 
 class Translator:
-    
     def __init__(self, config_dictionary):
         self.config_dictionary = config_dictionary 
         self.commands_list = []
@@ -13,9 +13,7 @@ class Translator:
         for check in self.config_dictionary['check']:
             for check_pass in check['pass']:
                 check_type = check_pass['type']
-                if check_type in self.types_dictionary:
-                    #maybe a paramater list here
-                    for parameter in self.types_dictionary[check_type]:
-                        print(parameter)
-                        #prob add to the list here
-                    #then add to cmd_list by call to command creation method here?
+                output = getattr(Security, check_type.lower())
+                print(check_pass)
+                self.commands_list.append(output(check_pass)) # output takes in dict
+        print(self.commands_list)
