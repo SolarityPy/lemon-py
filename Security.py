@@ -1,12 +1,5 @@
 import subprocess, os
 
-"""
-it's gonna be worse follow me to where i go
-
-
-im telling you it will work better and be flexable
-"""
-
 class Security:
     @staticmethod
     def firewallup(param_dictionary): # needs same name as type, param dictionary can be empty but for sake of simplicity

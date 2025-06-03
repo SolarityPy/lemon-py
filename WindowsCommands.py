@@ -1,4 +1,4 @@
-import subprocess, os
+import subprocess, os, requests
 
 class Commands:
     
@@ -58,16 +58,39 @@ class Commands:
                     return f"net user '{p['user']}' /PasswordChg:No"
             
     @staticmethod
-    def user_in_group_command(p):
+    def program_installed_command(p, not_boolean): # In the future, Lemon will ask the user for any required programs: Lemon will use this check as penalty
+        program_list = {
+            "firefox": {
+                "extension": "exe",
+                "latest": "https://download.mozilla.org/?product=firefox-stub&os=win&lang=en-US",
+                "old": "http://software.oldversion.com/download.php?f=YTo1OntzOjQ6InRpbWUiO2k6MTc0ODk3MzQwNztzOjI6ImlkIjtpOjQxMjAzO3M6NDoiZmlsZSI7czoyODoibW96aWxsYS1maXJlZm94LTQ2LTAtMS0wLmV4ZSI7czozOiJ1cmwiO3M6NTg6Imh0dHA6Ly93d3cub2xkdmVyc2lvbi5jb20vd2luZG93cy9tb3ppbGxhLWZpcmVmb3gtNDYtMC0xLTAiO3M6NDoicGFzcyI7czozMjoiZWU0NmQzMzBjYTA5ZTJmMjYzY2FhMzc4ZTEwYzU1OWQiO30%3D",
+            }
+        }
+        # we're going to need some prompt function, it pops up the box and asks the user whether they want the latest or out of date
+        old_version = False
+        
+        for program in program_list.keys():
+            if p['name'].lower() in program or program in p['name'].lower:
+                download_url = program_list[program]["latest" if not old_version else "old"]
+                extension = program_list[program]['extension']
+                with open(f"./{program}.{extension}"):
+                    pass
+                    
         pass
-    # === COMMAND MAPPING ===
+
     commands = {
         # === USER COMMANDS ===
-        #"feet": lambda p: f"feet{p}", (why is there a feet command :O - karl)
+        # Note: https://www.tenforums.com/attachments/tutorial-test/142289d1499096195-change-user-rights-assignment-security-policy-settings-windows-10-a-ntrights.zip
+        # Only way to change user rights assignment is to use this program, first dependency :(
+            
         "userexists": lambda p: f"net user {p['name']} /delete",
         "userexistsnot": lambda p: f"net user {p['name']} CyberPatriots1! /add",
+        
         "userdetail": user_detail_command,
         "userdetailnot": user_detail_command,
+        
+        "useringroup": lambda p: f"net localgroup '{p['group']}' '{p['user']}' /delete",
+        "useringroupnot": lambda p: f"net localgroup '{p['group']}' '{p['user']}' /add",
         
         # === SECURITY COMMANDS ===
         "firewallup": lambda p: "netsh advfirewall set allprofiles state off",
