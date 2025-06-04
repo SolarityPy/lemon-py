@@ -5,12 +5,11 @@ else:
     from LinuxCommands import Commands
     
 class Translator:
-    def __init__(self, config_dictionary):
+    def __init__(self, config_dictionary, root):
         self.config_dictionary = config_dictionary 
-        self.commands_list = [
-            Command, Command, Command
-        ] 
+        self.commands_list = [] 
         self.pre_commmands_list = []
+        self.root = root
         
         with open("check_types.json",  "r") as f:
             #dictionary that contains all Aeacus check types stored in a json file
@@ -20,11 +19,14 @@ class Translator:
         for check in self.config_dictionary['check']:
             for check_pass in check['pass']:
                 check_type = check_pass['type']
-                command_lambda = Commands.commands.get(check_type.lower())
+                
+                commands_obj = Commands(self.root)
+                command_method = commands_obj.commands.get(check_type.lower())
+                
                 if ("not" in check_pass['type'].lower()):
-                    command = command_lambda(check_pass, True)
+                    command = command_method(commands_obj, check_pass, True)
                 else:
-                    command = command_lambda(check_pass, False)
+                    command = command_method(commands_obj, check_pass, False)
                 
                 self.commands_list.append(command)
         print(self.commands_list)

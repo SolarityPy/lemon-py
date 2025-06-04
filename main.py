@@ -30,7 +30,7 @@ class App(ctk.CTk):
             config = ConfigParser(file_path)
             config_dictionary = config.parse()
             
-            translator_object = Translator(config_dictionary)
+            translator_object = Translator(config_dictionary, self)
             translator_object.translate()
 
 

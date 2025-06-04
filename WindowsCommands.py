@@ -3,10 +3,11 @@ from Command import Command
 from Prompt import Prompt
 
 class Commands:
-    
+    def __init__(self, root):
+        self.root = root
     # === COMPLEX COMMAND FUNCTIONS ===
-    @staticmethod
-    def user_detail_command(p, not_boolean):
+
+    def user_detail_command(self,p, not_boolean):
         if p['key'].lower() == "fullname" :
             return Command(f"net user '{p['user']}' /fullname:\"\"")
         
@@ -59,8 +60,8 @@ class Commands:
                 else:
                     return Command(f"net user '{p['user']}' /PasswordChg:Yes")
     
-    @staticmethod
-    def download(path, url):
+
+    def download(self, path, url):
         r = requests.get(url)
         if r.status_code == 200:
             with open(path, 'wb') as file:
@@ -69,15 +70,19 @@ class Commands:
         else:
             return None    
         
-    @staticmethod
-    def share_exists_command(p, not_boolean):
+
+    def share_exists_command(self, p, not_boolean):
         if not_boolean:
-            return Command(f"net share {p['name']} /delete")
+            path = Prompt(self.root, ["What path would you like the share to broadcast?"]).prompt()
+            
+            return Command(f"net share {p['name']}={path}") # create a new share
         else:
-            return Command(f"net share {p['name']}=")
+            return Command(f"net share {p['name']} /delete") # delete the share
         
-    @staticmethod
-    def program_installed_command(p, not_boolean): # In the future, Lemon will ask the user for any required programs: Lemon will use this check as penalty
+
+    def program_installed_command(self, p, not_boolean): # In the future, Lemon will ask the user for any required programs: Lemon will use this check as penalty
+        
+
         program_list = {
             "firefox": {
                 "extension": "msi",
@@ -88,7 +93,7 @@ class Commands:
         }
         # we're going to need some prompt function, it pops up the box and asks the user whether they want the latest or out of date
         choice = input(f"Latest version of {p['name']}? (y/n: installs old)")
-        Prompt.prompt()
+        Prompt(self.root).prompt()
         
         if choice.lower() == "y": old_version = False 
         else: old_version = True
@@ -109,37 +114,37 @@ class Commands:
         # Note: https://www.tenforums.com/attachments/tutorial-test/142289d1499096195-change-user-rights-assignment-security-policy-settings-windows-10-a-ntrights.zip
         # Only way to change user rights assignment is to use this program, first dependency :(
             
-        "userexists": lambda p: Command(f"net user {p['name']} /delete"),
-        "userexistsnot": lambda p:  Command(f"net user {p['name']} CyberPatriots1! /add"),
+        "userexists": lambda self, p: Command(f"net user {p['name']} /delete"),
+        "userexistsnot": lambda self, p: Command(f"net user {p['name']} CyberPatriots1! /add"),
         
-        "userdetail": user_detail_command,
-        "userdetailnot": user_detail_command,
+        "userdetail": lambda self, p, not_boolean: self.user_detail_command(p, not_boolean),
+        "userdetailnot": lambda self, p, not_boolean: self.user_detail_command(p, not_boolean),
         
-        "useringroup": lambda p: Command(f"net localgroup '{p['group']}' '{p['user']}' /delete"),
-        "useringroupnot": lambda p: Command(f"net localgroup '{p['group']}' '{p['user']}' /add"),
+        "useringroup": lambda self, p: Command(f"net localgroup '{p['group']}' '{p['user']}' /delete"),
+        "useringroupnot": lambda self, p: Command(f"net localgroup '{p['group']}' '{p['user']}' /add"),
         
-        "userrights": lambda p: Command(f"ntrights -r {p['value']} -u {p['name']}"),
-        "userrightsnot": lambda p: Command(f"ntrights +r {p['value']} -u {p['name']}"),
+        "userrights": lambda self, p: Command(f"ntrights -r {p['value']} -u {p['name']}"),
+        "userrightsnot": lambda self, p: Command(f"ntrights +r {p['value']} -u {p['name']}"),
         
         # === SECURITY COMMANDS ===
-        "firewallup": lambda p: Command("netsh advfirewall set allprofiles state off"),
-        "firewallupnot": lambda p: Command("netsh advfirewall set allprofiles state on"),
+        "firewallup": lambda self, p: Command("netsh advfirewall set allprofiles state off"),
+        "firewallupnot": lambda self, p: Command("netsh advfirewall set allprofiles state on"),
         
         # === WINDOWS FEATURES ===
-        "windowsfeature": lambda p: Command(f"Dism /Online /Disable-Feature /FeatureName:{p['name']}"),
-        "windowsfeaturenot": lambda p: Command(f"Dism /Online /Enable-Feature /FeatureName:{p['name']}"),
+        "windowsfeature": lambda self, p: Command(f"Dism /Online /Disable-Feature /FeatureName:{p['name']}"),
+        "windowsfeaturenot": lambda self, p: Command(f"Dism /Online /Enable-Feature /FeatureName:{p['name']}"),
         
         # === SERVICES ===
-        "serviceup": lambda p:  Command(f"sc stop '{p['name']}'"),
-        "serviceupnot": lambda p:  Command(f"sc start '{p['name']}'"),
+        "serviceup": lambda self, p: Command(f"sc stop '{p['name']}'"),
+        "serviceupnot": lambda self, p: Command(f"sc start '{p['name']}'"),
 
-        "servicestartup": lambda p: Command(f"sc config '{p['name']}' start='{"disabled" if p['startup'] == 'automatic' else 'auto'}'"),
-        "servicestartupnot": lambda p: Command(f"sc config '{p['name']}' start='{"auto" if p['startup'] == 'automatic' else 'disabled'}'"),
+        "servicestartup": lambda self, p: Command(f"sc config '{p['name']}' start='{"disabled" if p['startup'] == 'automatic' else 'auto'}'"),
+        "servicestartupnot": lambda self, p: Command(f"sc config '{p['name']}' start='{"auto" if p['startup'] == 'automatic' else 'disabled'}'"),
         
-        "programinstalled": program_installed_command,
-        "programinstallednot": program_installed_command,
+        "programinstalled": lambda self, p, not_boolean: self.program_installed_command(p, not_boolean),
+        "programinstallednot": lambda self, p, not_boolean: self.program_installed_command(p, not_boolean),
 
         # === MISCELLANEOUS ===
-        "shareexists": share_exists_command,
-        "shareexistsnot": share_exists_command
+        "shareexists": lambda self, p, not_boolean: self.share_exists_command(p, not_boolean),
+        "shareexistsnot": lambda self, p, not_boolean: self.share_exists_command(p, not_boolean)
     }
