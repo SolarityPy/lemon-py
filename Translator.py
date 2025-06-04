@@ -7,7 +7,11 @@ else:
 class Translator:
     def __init__(self, config_dictionary):
         self.config_dictionary = config_dictionary 
-        self.commands_list = []
+        self.commands_list = [
+            Command, Command, Command
+        ] 
+        self.pre_commmands_list = []
+        
         with open("check_types.json",  "r") as f:
             #dictionary that contains all Aeacus check types stored in a json file
             self.types_dictionary = json.load(f)
@@ -21,5 +25,6 @@ class Translator:
                     command = command_lambda(check_pass, True)
                 else:
                     command = command_lambda(check_pass, False)
+                
                 self.commands_list.append(command)
         print(self.commands_list)
