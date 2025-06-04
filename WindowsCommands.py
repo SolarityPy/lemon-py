@@ -75,6 +75,8 @@ class Commands:
                 "latest": "https://download.mozilla.org/?product=firefox-msi-latest-ssl&os=win64&lang=en-US&attribution_code=c291cmNlPXN1cHBvcnQubW96aWxsYS5vcmcmbWVkaXVtPXJlZmVycmFsJmNhbXBhaWduPShub3Qgc2V0KSZjb250ZW50PShub3Qgc2V0KSZleHBlcmltZW50PShub3Qgc2V0KSZ2YXJpYXRpb249KG5vdCBzZXQpJnVhPWVkZ2UmY2xpZW50X2lkX2dhND01MDEzNzE4NDguMTc0OTAwNDc0MyZzZXNzaW9uX2lkPTc3MjMwNTMyODQmZGxzb3VyY2U9bW96b3Jn&attribution_sig=7ba90acf45f025ea79b153fc3f23cd0c46d921bbcc0dbcf340eb123d007103ae&_gl=1*1w7f5lo*_ga*NTAxMzcxODQ4LjE3NDkwMDQ3NDM.*_ga_MQ7767QQQW*czE3NDkwMDQ3NDMkbzEkZzEkdDE3NDkwMDQ4NzYkajQ3JGwwJGgw",
                 "old": r"https://ftp.mozilla.org/pub/firefox/releases/106.0b3/win64/en-US/Firefox%20Setup%20106.0b3.msi",
                 "old_version": "106.0b3"
+
+                
             }
         }
         # we're going to need some prompt function, it pops up the box and asks the user whether they want the latest or out of date
@@ -92,7 +94,6 @@ class Commands:
                 if Commands.download(file_name, download_url):
                     if extension == "msi":
                         return file_name + " /qn"
-                    
         pass
 
     commands = {
@@ -109,6 +110,9 @@ class Commands:
         "useringroup": lambda p: f"net localgroup '{p['group']}' '{p['user']}' /delete",
         "useringroupnot": lambda p: f"net localgroup '{p['group']}' '{p['user']}' /add",
         
+        "userrights": lambda p: f"ntrights -r {p['value']} -u {p['name']}",
+        "userrightsnot": lambda p: f"ntrights +r {p['value']} -u {p['name']}",
+        
         # === SECURITY COMMANDS ===
         "firewallup": lambda p: "netsh advfirewall set allprofiles state off",
         "firewallupnot": lambda p: "netsh advfirewall set allprofiles state on",
@@ -118,8 +122,19 @@ class Commands:
         "windowsfeaturenot": lambda p: f"Dism /Online /Enable-Feature /FeatureName:{p['name']}",
         
         # === SERVICES ===
-        "serviceup": lambda p: f"sc stop {p['name']}",
-        "serviceupnot": lambda p: f"sc start {p['name']}",
+        "serviceup": lambda p: f"sc stop '{p['name']}'",
+        "serviceupnot": lambda p: f"sc start '{p['name']}'",
+
+        "servicestartup": lambda p: f"sc config '{p['name']}' start='{"disabled" if p['startup'] == 'automatic' else 'auto'}'",
+        "servicestartupnot": lambda p: f"sc config '{p['name']}' start='{"auto" if p['startup'] == 'automatic' else 'disabled'}'",
         
-        "programinstalled": program_installed_command
+
+        
+        "programinstalled": program_installed_command,
+        "programinstallednot": program_installed_command,
+
+        # === MISCELLANEOUS ===
+        "shareexists": lambda p: f"net share '{p['name']}' /delete",
+        "shareexistsnot": lambda p: f"net share '{p['name']}'="
+        
     }
