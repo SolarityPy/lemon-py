@@ -78,7 +78,7 @@ class Commands:
             }
         }
         # we're going to need some prompt function, it pops up the box and asks the user whether they want the latest or out of date
-        choice = input(f"Latest version of Program {p['name']}? (y/n: installs old)")
+        choice = input(f"Latest version of {p['name']}? (y/n: installs old)")
         
         if choice.lower() == "y": old_version = False 
         else: old_version = True
@@ -89,7 +89,7 @@ class Commands:
                 extension = program_list[program]['extension']
                 
                 file_name = f"{program}.{extension}"
-                if Commands.download("./programs/" + file_name, download_url):
+                if Commands.download(file_name, download_url):
                     if extension == "msi":
                         return file_name + " /qn"
                     
