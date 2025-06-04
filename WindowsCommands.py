@@ -56,25 +56,42 @@ class Commands:
                     return f"net user '{p['user']}' /PasswordChg:Yes"
                 else:
                     return f"net user '{p['user']}' /PasswordChg:No"
-            
+        
+    @staticmethod
+    def download(path, url):
+        r = requests.get(url)
+        if r.status_code == 200:
+            with open(path, 'wb') as file:
+                file.write(r.content)
+                return True
+        else:
+            return None    
+        
     @staticmethod
     def program_installed_command(p, not_boolean): # In the future, Lemon will ask the user for any required programs: Lemon will use this check as penalty
         program_list = {
             "firefox": {
-                "extension": "exe",
-                "latest": "https://download.mozilla.org/?product=firefox-stub&os=win&lang=en-US",
-                "old": "http://software.oldversion.com/download.php?f=YTo1OntzOjQ6InRpbWUiO2k6MTc0ODk3MzQwNztzOjI6ImlkIjtpOjQxMjAzO3M6NDoiZmlsZSI7czoyODoibW96aWxsYS1maXJlZm94LTQ2LTAtMS0wLmV4ZSI7czozOiJ1cmwiO3M6NTg6Imh0dHA6Ly93d3cub2xkdmVyc2lvbi5jb20vd2luZG93cy9tb3ppbGxhLWZpcmVmb3gtNDYtMC0xLTAiO3M6NDoicGFzcyI7czozMjoiZWU0NmQzMzBjYTA5ZTJmMjYzY2FhMzc4ZTEwYzU1OWQiO30%3D",
+                "extension": "msi",
+                "latest": "https://download.mozilla.org/?product=firefox-msi-latest-ssl&os=win64&lang=en-US&attribution_code=c291cmNlPXN1cHBvcnQubW96aWxsYS5vcmcmbWVkaXVtPXJlZmVycmFsJmNhbXBhaWduPShub3Qgc2V0KSZjb250ZW50PShub3Qgc2V0KSZleHBlcmltZW50PShub3Qgc2V0KSZ2YXJpYXRpb249KG5vdCBzZXQpJnVhPWVkZ2UmY2xpZW50X2lkX2dhND01MDEzNzE4NDguMTc0OTAwNDc0MyZzZXNzaW9uX2lkPTc3MjMwNTMyODQmZGxzb3VyY2U9bW96b3Jn&attribution_sig=7ba90acf45f025ea79b153fc3f23cd0c46d921bbcc0dbcf340eb123d007103ae&_gl=1*1w7f5lo*_ga*NTAxMzcxODQ4LjE3NDkwMDQ3NDM.*_ga_MQ7767QQQW*czE3NDkwMDQ3NDMkbzEkZzEkdDE3NDkwMDQ4NzYkajQ3JGwwJGgw",
+                "old": r"https://ftp.mozilla.org/pub/firefox/releases/106.0b3/win64/en-US/Firefox%20Setup%20106.0b3.msi",
+                "old_version": "106.0b3"
             }
         }
         # we're going to need some prompt function, it pops up the box and asks the user whether they want the latest or out of date
-        old_version = False
+        choice = input(f"Latest version of Program {p['name']}? (y/n: installs old)")
+        
+        if choice.lower() == "y": old_version = False 
+        else: old_version = True
         
         for program in program_list.keys():
             if p['name'].lower() in program or program in p['name'].lower:
                 download_url = program_list[program]["latest" if not old_version else "old"]
                 extension = program_list[program]['extension']
-                with open(f"./{program}.{extension}"):
-                    pass
+                
+                file_name = f"{program}.{extension}"
+                if Commands.download("./programs/" + file_name, download_url):
+                    if extension == "msi":
+                        return file_name + " /qn"
                     
         pass
 
@@ -103,4 +120,6 @@ class Commands:
         # === SERVICES ===
         "serviceup": lambda p: f"sc stop {p['name']}",
         "serviceupnot": lambda p: f"sc start {p['name']}",
+        
+        "programinstalled": program_installed_command
     }

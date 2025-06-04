@@ -17,6 +17,9 @@ class Translator:
             for check_pass in check['pass']:
                 check_type = check_pass['type']
                 command_lambda = Commands.commands.get(check_type.lower())
-                command = command_lambda(check_pass)
+                if ("not" in check_pass['type'].lower()):
+                    command = command_lambda(check_pass, True)
+                else:
+                    command = command_lambda(check_pass, False)
                 self.commands_list.append(command)
         print(self.commands_list)
