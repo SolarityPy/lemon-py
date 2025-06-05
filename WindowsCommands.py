@@ -82,33 +82,47 @@ class Commands:
 
     def program_installed_command(self, p, not_boolean): # In the future, Lemon will ask the user for any required programs: Lemon will use this check as penalty
         program_list = {
-            "firefox": {
+            "FireFox": {
                 "extension": "msi",
-                "latest": "https://download.mozilla.org/?product=firefox-msi-latest-ssl&os=win64&lang=en-US&attribution_code=c291cmNlPXN1cHBvcnQubW96aWxsYS5vcmcmbWVkaXVtPXJlZmVycmFsJmNhbXBhaWduPShub3Qgc2V0KSZjb250ZW50PShub3Qgc2V0KSZleHBlcmltZW50PShub3Qgc2V0KSZ2YXJpYXRpb249KG5vdCBzZXQpJnVhPWVkZ2UmY2xpZW50X2lkX2dhND01MDEzNzE4NDguMTc0OTAwNDc0MyZzZXNzaW9uX2lkPTc3MjMwNTMyODQmZGxzb3VyY2U9bW96b3Jn&attribution_sig=7ba90acf45f025ea79b153fc3f23cd0c46d921bbcc0dbcf340eb123d007103ae&_gl=1*1w7f5lo*_ga*NTAxMzcxODQ4LjE3NDkwMDQ3NDM.*_ga_MQ7767QQQW*czE3NDkwMDQ3NDMkbzEkZzEkdDE3NDkwMDQ4NzYkajQ3JGwwJGgw",
+                "latest": r"https://download.mozilla.org/?product=firefox-msi-latest-ssl&os=win64&lang=en-US&attribution_code=c291cmNlPXN1cHBvcnQubW96aWxsYS5vcmcmbWVkaXVtPXJlZmVycmFsJmNhbXBhaWduPShub3Qgc2V0KSZjb250ZW50PShub3Qgc2V0KSZleHBlcmltZW50PShub3Qgc2V0KSZ2YXJpYXRpb249KG5vdCBzZXQpJnVhPWVkZ2UmY2xpZW50X2lkX2dhND01MDEzNzE4NDguMTc0OTAwNDc0MyZzZXNzaW9uX2lkPTc3MjMwNTMyODQmZGxzb3VyY2U9bW96b3Jn&attribution_sig=7ba90acf45f025ea79b153fc3f23cd0c46d921bbcc0dbcf340eb123d007103ae&_gl=1*1w7f5lo*_ga*NTAxMzcxODQ4LjE3NDkwMDQ3NDM.*_ga_MQ7767QQQW*czE3NDkwMDQ3NDMkbzEkZzEkdDE3NDkwMDQ4NzYkajQ3JGwwJGgw",
                 "old": r"https://ftp.mozilla.org/pub/firefox/releases/106.0b3/win64/en-US/Firefox%20Setup%20106.0b3.msi",
                 "old_version": "106.0b3"
+            },
+
+            "CCleaner": {
+                "extemsion" : "msi",
+                "latest" : r"https://www.ccleaner.com/go/get_ccbe_msi",
+                "old": r"", #find later
+                "old_version": ""
+            },
+
+            "Notepad++": {
+                "extemsion" : "msi",
+                "latest" : r"",
+                "old": r"", #find later
+                "old_version": ""
             }
         }
 
         desired_program = Prompt(self.root, program_list).click_disired_prompt()
-
-        choice = input(f"Latest version of {p['name']}? (y/n: installs old)")
-        Prompt(self.root).prompt()
-        
-        if choice.lower() == "y": old_version = False 
-        else: old_version = True
-        
-        for program in program_list.keys():
-            if p['name'].lower() in program or program in p['name'].lower:
-                download_url = program_list[program]["latest" if not old_version else "old"]
-                extension = program_list[program]['extension']
-                
-                file_name = f"{program}.{extension}"
-                if Commands.download(file_name, download_url):
-                    if extension == "msi":
-                        return Command(file_name + " /qn")
-        pass
-
+    '''
+            choice = input(f"Latest version of {p['name']}? (y/n: installs old)")
+            Prompt(self.root).prompt()
+            
+            if choice.lower() == "y": old_version = False 
+            else: old_version = True
+            
+            for program in program_list.keys():
+                if p['name'].lower() in program or program in p['name'].lower:
+                    download_url = program_list[program]["latest" if not old_version else "old"]
+                    extension = program_list[program]['extension']
+                    
+                    file_name = f"{program}.{extension}"
+                    if Commands.download(file_name, download_url):
+                        if extension == "msi":
+                            return Command(file_name + " /qn")
+            pass
+    '''
     commands = {
         # === USER COMMANDS ===
         # Note: https://www.tenforums.com/attachments/tutorial-test/142289d1499096195-change-user-rights-assignment-security-policy-settings-windows-10-a-ntrights.zip
