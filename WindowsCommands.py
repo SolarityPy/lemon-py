@@ -73,7 +73,7 @@ class Commands:
 
     def share_exists_command(self, p, not_boolean):
         if not_boolean:
-            path = Prompt(self.root, ["What path would you like the share to broadcast?"]).prompt()
+            path = Prompt(self.root, ["What path would you like the share to broadcast?"]).question_prompt()
             
             return Command(f"net share {p['name']}={path}") # create a new share
         else:
@@ -81,8 +81,6 @@ class Commands:
         
 
     def program_installed_command(self, p, not_boolean): # In the future, Lemon will ask the user for any required programs: Lemon will use this check as penalty
-        
-
         program_list = {
             "firefox": {
                 "extension": "msi",
@@ -91,7 +89,9 @@ class Commands:
                 "old_version": "106.0b3"
             }
         }
-        # we're going to need some prompt function, it pops up the box and asks the user whether they want the latest or out of date
+
+        desired_program = Prompt(self.root, program_list).click_disired_prompt()
+
         choice = input(f"Latest version of {p['name']}? (y/n: installs old)")
         Prompt(self.root).prompt()
         
