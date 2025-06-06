@@ -3,9 +3,10 @@ from PIL import Image
 from Resolve import Resolve
 
 class Hub:
-    def __init__(self, root, command_objects_list):
+    def __init__(self, root, command_objects_list, resolve_answers=None):
         self.root = root
         self.command_objects_list = command_objects_list
+        self.resolve_answers = resolve_answers
         
     def clear_screen(self):
         for widget in self.root.winfo_children():
@@ -16,6 +17,7 @@ class Hub:
         self.clear_screen()
     
     def create_hub(self, conf_dic):
+        self.conf_dic = conf_dic
         root = self.root
         
         self.init()
@@ -91,9 +93,19 @@ class Hub:
             button = CTkButton(pane, text=btn_data["btn"], command=btn_data["command"], height=45, font=("Arial", 16, "bold"))
             button.grid(row=i//2, column=i%2, padx=10, pady=10, sticky="new")
 
-        resolve_obj = Resolve(root, self.command_objects_list)
-        resolve_btn = CTkButton(pane, text="Resolve", command=lambda: resolve_obj.resolve(), height=60, font=("Bahnschrift", 20, "bold"), fg_color="#A00E1A", hover_color="#860A0A")
+        resolve_btn = CTkButton(pane, text="Resolve", command=lambda: self.open_resolve_mode(), height=60, font=("Bahnschrift", 20, "bold"), fg_color="#A00E1A", hover_color="#860A0A")
         resolve_btn.grid(row=4, column=0, columnspan=2, padx=10, pady=10, sticky="ew")
 
         build_btn = CTkButton(pane, text="Build", command="", height=80, font=("Bahnschrift", 20, "bold"))
         build_btn.grid(row=5, column=0, columnspan=2, padx=10, pady=10, sticky="ew")
+
+    def open_resolve_mode(self):
+        #callback function that restores hub
+        def hub_callback(resolve_answers):
+            self.clear_screen()
+            self.resolve_answers = resolve_answers
+            self.create_hub(self.conf_dic) # recreate hub
+        
+        # Pass this callback to Resolve
+        resolve = Resolve(self.root, self.command_objects_list, hub_callback, self.resolve_answers)
+        resolve.resolve()
