@@ -1,9 +1,11 @@
 import subprocess, os, requests
+from Command import Command
 from Prompt import Prompt
 
 class Commands:
     def __init__(self, root):
         self.root = root
+        
     # === COMPLEX COMMAND FUNCTIONS ===
 
     def user_detail_command(self,p, not_boolean):
@@ -72,9 +74,7 @@ class Commands:
 
     def share_exists_command(self, p, not_boolean):
         if not_boolean:
-            path = Prompt(self.root, ["What path would you like the share to broadcast?"]).question_prompt()
-            
-            return Command(f"net share {p['name']}={path}") # create a new share
+            return Command(f"net share {p['name']}=#share_path#", True, ["What path would you like the share to broadcast?"]) # create a new share
         else:
             return Command(f"net share {p['name']} /delete") # delete the share
         
@@ -102,31 +102,19 @@ class Commands:
                 "old_version": ""
             }
         }
+        
+        for program in program_list.keys():
+            if (program.lower() in p['name'].lower()): # if Firefox is in Firefox Version 18.e.b   \ If firefix version 18.eb in firefox
+            
+                return Command("#file_msi_path# /qn", prereq_required=True, radio_button_options=[
+                    {
+                        "old": program_list[str(program)]['old'], "version": program_list[str(program)]['old_version']
+                    },
+                    {
+                        "new": program_list[str(program)]['latest'], "version": "latest"
+                    }
+                ])
 
-        '''
-        Since we're in program installed, we have to make separate methods 
-        '''
-        desired_program = Prompt(self.root).program_prompt(p['name'], program_list)
-        
-        
-    '''
-            choice = input(f"Latest version of {p['name']}? (y/n: installs old)")
-            Prompt(self.root).prompt()
-            
-            if choice.lower() == "y": old_version = False 
-            else: old_version = True
-            
-            for program in program_list.keys():
-                if p['name'].lower() in program or program in p['name'].lower:
-                    download_url = program_list[program]["latest" if not old_version else "old"]
-                    extension = program_list[program]['extension']
-                    
-                    file_name = f"{program}.{extension}"
-                    if Commands.download(file_name, download_url):
-                        if extension == "msi":
-                            return Command(file_name + " /qn")
-            pass
-    '''
     commands = {
         # === USER COMMANDS ===
         # Note: https://www.tenforums.com/attachments/tutorial-test/142289d1499096195-change-user-rights-assignment-security-policy-settings-windows-10-a-ntrights.zip

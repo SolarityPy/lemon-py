@@ -8,7 +8,6 @@ class Translator:
     def __init__(self, config_dictionary, root):
         self.config_dictionary = config_dictionary 
         self.commands_list = [] 
-        self.pre_commmands_list = []
         self.root = root
         
         with open("check_types.json",  "r") as f:
@@ -24,9 +23,13 @@ class Translator:
                 command_method = commands_obj.commands.get(check_type.lower())
                 
                 if ("not" in check_pass['type'].lower()):
-                    command = command_method(commands_obj, check_pass, True)
+                    command_dictionary = command_method(commands_obj, check_pass, True)
                 else:
-                    command = command_method(commands_obj, check_pass, False)
+                    command_dictionary = command_method(commands_obj, check_pass, False)
+                    
+                self.commands_list.append({
+                    "command": command_dictionary['command_string'],
+                    "prerequesite_questions": command_dictionary['prerequesite_commands']
+                })
                 
-                self.commands_list.append(command)
-        print(self.commands_list)
+        return self.commands_list

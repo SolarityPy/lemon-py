@@ -35,16 +35,16 @@ class App(ctk.CTk):
         # Force window update before creating hub
         self.update_idletasks()
         
+        translator_object = Translator(config_dictionary, self)
+        translator_object.translate()
+        
         hub = Hub(self)
         hub.create_hub(config_dictionary)
         
         # Force layout recalculation
         self.update_idletasks()
 
-        '''
-        translator_object = Translator(config_dictionary, self)
-        translator_object.translate()
-        '''
+        
 
 # Initializes main loop
 app = App()
