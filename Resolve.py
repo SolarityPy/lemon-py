@@ -6,6 +6,8 @@ class Resolve:
         self.command_obj_list = command_obj_list
         self.index = 1
         self.question_formatted_list = []
+        self.user_answers = {}  # Store answers
+        self.radio_var = tk.StringVar()  # Make it persistent
 
     def clear_screen(self):
         for widget in self.root.winfo_children():
@@ -15,12 +17,22 @@ class Resolve:
         self.clear_screen()
         question_dict = self.question_formatted_list[self.index - 1]
         
+        # Configure grid once
+        for i in range(3):
+            self.root.grid_columnconfigure(i, weight=1)
+        for i in range(5):
+            self.root.grid_rowconfigure(i, weight=1)
+        
         # Center the question label
         label = CTkLabel(self.root, text=question_dict['question'])
-        label.grid(row=0, column=0, columnspan=3, pady=20)
+        label.grid(row=0, column=0, columnspan=3, pady=20, sticky="n")
         
         if question_dict['type'] == "radio_options":
-            self.radio_var = tk.StringVar(value="")
+            # Restore previous answer if exists
+            if self.index in self.user_answers:
+                self.radio_var.set(self.user_answers[self.index])
+            else:
+                self.radio_var.set("")
             
             # Center the radio buttons
             for i, option in enumerate(question_dict['options']):
@@ -30,25 +42,30 @@ class Resolve:
                     variable=self.radio_var,
                     value=option
                 )
-                # Place radio buttons in center column with some padding
                 radio_btn.grid(row=i+1, column=1, pady=5, padx=20, sticky="w")
         
-        # Recreate the Back and Next buttons
+        # Create buttons
         back_button = CTkButton(self.root, text="Back", height=30, width=120, command=self.decrease_index)
         next_button = CTkButton(self.root, text="Next", height=30, width=120, command=self.increase_index)
-        back_button.grid(row=4, column=0, padx=20, pady=10)
-        next_button.grid(row=4, column=2, padx=20, pady=10)
+        
+        # Show appropriate buttons
+        if self.index > 1:
+            back_button.grid(row=4, column=0, padx=20, pady=10)
+        if self.index < len(self.question_formatted_list):
+            next_button.grid(row=4, column=2, padx=20, pady=10)
 
     def init(self): 
         self.root.geometry("600x450")
         self.clear_screen()
         
     def increase_index(self):
+        self.save_current_answer()
         if self.index < len(self.question_formatted_list): 
             self.index += 1
             self.update_screen()
         
     def decrease_index(self):
+        self.save_current_answer()
         if self.index > 1: 
             self.index -= 1
             self.update_screen()
@@ -83,3 +100,9 @@ class Resolve:
                         })
                         
         self.create_resolve()
+
+    def save_current_answer(self):
+        """Save current selection before navigating"""
+        current_answer = self.radio_var.get()
+        if current_answer:
+            self.user_answers[self.index] = current_answer
