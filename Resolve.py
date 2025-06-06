@@ -13,7 +13,6 @@ class Resolve:
             
     def update_screen(self):
         self.clear_screen()
-        print("update screen called")
         question_dict = self.question_formatted_list[self.index - 1]
         
         # Center the question label
@@ -45,15 +44,11 @@ class Resolve:
         self.clear_screen()
         
     def increase_index(self):
-        print(self.index)
-        print(self.question_formatted_list)
         if self.index < len(self.question_formatted_list): 
             self.index += 1
             self.update_screen()
         
     def decrease_index(self):
-        print(self.index)
-        print(self.question_formatted_list)
         if self.index > 1: 
             self.index -= 1
             self.update_screen()
