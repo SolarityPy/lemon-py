@@ -23,13 +23,10 @@ class Translator:
                 command_method = commands_obj.commands.get(check_type.lower())
                 
                 if ("not" in check_pass['type'].lower()):
-                    command_dictionary = command_method(commands_obj, check_pass, True)
+                    command_object = command_method(commands_obj, check_pass, True)
                 else:
-                    command_dictionary = command_method(commands_obj, check_pass, False)
+                    command_object = command_method(commands_obj, check_pass, False)
                     
-                self.commands_list.append({
-                    "command": command_dictionary['command_string'],
-                    "prerequesite_questions": command_dictionary['prerequesite_commands']
-                })
+                self.commands_list.append(command_object)
                 
         return self.commands_list

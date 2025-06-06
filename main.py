@@ -36,9 +36,11 @@ class App(ctk.CTk):
         self.update_idletasks()
         
         translator_object = Translator(config_dictionary, self)
-        translator_object.translate()
+        command_objects_list = translator_object.translate()
+                    
+        # Iterate through all Command objects and pass in any required questions to the hub
         
-        hub = Hub(self)
+        hub = Hub(self, command_objects_list)
         hub.create_hub(config_dictionary)
         
         # Force layout recalculation

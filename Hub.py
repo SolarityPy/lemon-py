@@ -1,9 +1,11 @@
 from customtkinter import CTk, CTkLabel, CTkButton, CTkEntry, CTkFrame, CTkScrollableFrame, CTkImage
 from PIL import Image
+from Resolve import Resolve
 
 class Hub:
-    def __init__(self, root):
+    def __init__(self, root, command_objects_list):
         self.root = root
+        self.command_objects_list = command_objects_list
         
     def clear_screen(self):
         for widget in self.root.winfo_children():
@@ -89,7 +91,8 @@ class Hub:
             button = CTkButton(pane, text=btn_data["btn"], command=btn_data["command"], height=45, font=("Arial", 16, "bold"))
             button.grid(row=i//2, column=i%2, padx=10, pady=10, sticky="new")
 
-        resolve_btn = CTkButton(pane, text="Resolve", command="", height=60, font=("Bahnschrift", 20, "bold"), fg_color="#A00E1A", hover_color="#860A0A")
+        resolve_obj = Resolve(root, self.command_objects_list)
+        resolve_btn = CTkButton(pane, text="Resolve", command=lambda: resolve_obj.resolve(), height=60, font=("Bahnschrift", 20, "bold"), fg_color="#A00E1A", hover_color="#860A0A")
         resolve_btn.grid(row=4, column=0, columnspan=2, padx=10, pady=10, sticky="ew")
 
         build_btn = CTkButton(pane, text="Build", command="", height=80, font=("Bahnschrift", 20, "bold"))

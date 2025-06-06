@@ -106,14 +106,27 @@ class Commands:
         for program in program_list.keys():
             if (program.lower() in p['name'].lower()): # if Firefox is in Firefox Version 18.e.b   \ If firefix version 18.eb in firefox
             
-                return Command("#file_msi_path# /qn", prereq_required=True, radio_button_options=[
+                return Command("#file_msi_path# /qn", prereq_required=True, radio_button_options={
+                    "questions": [
+                        { # FOR FUTURE: DETECT IF EXISTING PROGRAMVERSIONNOT CHECKS ARE IMPLEMENTED FOR SAME PROGRAM
+                            "question": f"What version of {program} did you want to install?",
+                            "options": [
+                                f"Old Version ({program_list[program]['old_version']})", "Latest Version"
+                            ]
+                        }
+                    ]
+                })
+            
+
+
+            '''
                     {
                         "old": program_list[str(program)]['old'], "version": program_list[str(program)]['old_version']
                     },
                     {
                         "new": program_list[str(program)]['latest'], "version": "latest"
                     }
-                ])
+                ])'''
 
     commands = {
         # === USER COMMANDS ===
