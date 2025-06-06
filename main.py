@@ -1,6 +1,7 @@
 import customtkinter as ctk
 from ConfigParser import ConfigParser
 from Translator import Translator
+from Hub import Hub
 from tkinter import filedialog
 
 class App(ctk.CTk):
@@ -27,12 +28,22 @@ class App(ctk.CTk):
         
         # Only proceeds if file is chosen
         if file_path:
+            hub = Hub(self)
+            hub.create_buttons()
+            
+            
+            
+            
+            
+            
+            
+            '''
             config = ConfigParser(file_path)
             config_dictionary = config.parse()
             
             translator_object = Translator(config_dictionary, self)
             translator_object.translate()
-
+            '''
 
 # Initializes main loop
 app = App()

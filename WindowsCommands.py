@@ -1,5 +1,4 @@
 import subprocess, os, requests
-from Command import Command
 from Prompt import Prompt
 
 class Commands:
@@ -82,7 +81,7 @@ class Commands:
 
     def program_installed_command(self, p, not_boolean): # In the future, Lemon will ask the user for any required programs: Lemon will use this check as penalty
         program_list = {
-            "FireFox": {
+            "Firefox": {
                 "extension": "msi",
                 "latest": r"https://download.mozilla.org/?product=firefox-msi-latest-ssl&os=win64&lang=en-US&attribution_code=c291cmNlPXN1cHBvcnQubW96aWxsYS5vcmcmbWVkaXVtPXJlZmVycmFsJmNhbXBhaWduPShub3Qgc2V0KSZjb250ZW50PShub3Qgc2V0KSZleHBlcmltZW50PShub3Qgc2V0KSZ2YXJpYXRpb249KG5vdCBzZXQpJnVhPWVkZ2UmY2xpZW50X2lkX2dhND01MDEzNzE4NDguMTc0OTAwNDc0MyZzZXNzaW9uX2lkPTc3MjMwNTMyODQmZGxzb3VyY2U9bW96b3Jn&attribution_sig=7ba90acf45f025ea79b153fc3f23cd0c46d921bbcc0dbcf340eb123d007103ae&_gl=1*1w7f5lo*_ga*NTAxMzcxODQ4LjE3NDkwMDQ3NDM.*_ga_MQ7767QQQW*czE3NDkwMDQ3NDMkbzEkZzEkdDE3NDkwMDQ4NzYkajQ3JGwwJGgw",
                 "old": r"https://ftp.mozilla.org/pub/firefox/releases/106.0b3/win64/en-US/Firefox%20Setup%20106.0b3.msi",
@@ -104,7 +103,12 @@ class Commands:
             }
         }
 
-        desired_program = Prompt(self.root, program_list).click_disired_prompt()
+        '''
+        Since we're in program installed, we have to make separate methods 
+        '''
+        desired_program = Prompt(self.root).program_prompt(p['name'], program_list)
+        
+        
     '''
             choice = input(f"Latest version of {p['name']}? (y/n: installs old)")
             Prompt(self.root).prompt()

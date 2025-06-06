@@ -1,9 +1,8 @@
 from customtkinter import CTk, CTkLabel, CTkButton, CTkEntry, CTkFrame, CTkScrollableFrame, CTkImage
 from PIL import Image
 class Prompt:
-    def __init__(self, root, prompts):
+    def __init__(self, root):
         self.root = root
-        self.prompts = prompts
         
     def clear_screen(self):
         for widget in self.root.winfo_children():
@@ -52,12 +51,16 @@ class Prompt:
         ctl_image = CTkImage(pil_image, size=(48, 48))
         return ctl_image
     
-    def click_disired_prompt(self):
+    # i have bigger ideas for this, I think we can actually have one screen in the end which
+    # have all the required user input prompts, ex. all programs, shares,
+    def program_prompt(self, program_name, program_list):
         self.prep_prompt()
-        program_list = list(self.prompts.keys())
+        program_list = list(program_list.keys())
+
         for i in range(len(program_list)):
-            self.root.grid_columnconfigure(i, weight=1)
-            program_name = program_list[i]
-            program_icon = self.load_image(program_name.lower())
-            program_button = CTkButton(self.root, image=program_icon, text=program_name, compound="bottom")
-            program_button.grid(row=i//2, column=i%2, padx=25, pady=10)
+            if (program_list[i].lower() in program_name.lower()) or (program_name.lower() in program_list[i].lower()):
+                self.root.grid_columnconfigure(i, weight=1)
+                program_name = program_list[i]
+                program_icon = self.load_image(program_name.lower())
+                program_button = CTkButton(self.root, image=program_icon, text=program_name, compound="bottom")
+                program_button.grid(row=i//2, column=i%2, padx=25, pady=10)
