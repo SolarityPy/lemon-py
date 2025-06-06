@@ -25,9 +25,9 @@ class Hub:
         left_pane.grid(row=0, column=0, padx=5, pady=5, sticky="nsew")
         self.fill_left_pane(left_pane, conf_dic)
         
-        # Change padx to fill the gap completely
         right_pane = CTkFrame(root, border_width=5)
         right_pane.grid(row=0, column=1, padx=(2, 5), pady=5, sticky="nsew")
+        self.fill_right_pane(right_pane)
 
         '''
         forensics_
@@ -49,17 +49,41 @@ class Hub:
         conf_points.grid(row=1, column=0, padx=10, pady=(20, 0), sticky="nw")
 
         total_vulns = CTkLabel(pane, text=f"{total_vulns} vulns.", font=("Arial", 16, "bold"), wraplength=100, justify="left")
-        total_vulns.grid(row=2, column=0, padx=10, pady=(0, 5), sticky="nw")
+        total_vulns.grid(row=2, column=0, padx=10, pady=(0, 0), sticky="nw")
 
         conf_os = CTkLabel(pane, text=f"OS: {conf_dic['os'].title()}", font=("Arial", 16, "bold"), wraplength=100, justify="left")
-        conf_os.grid(row=3, column=0, padx=10, pady=(20, 5), sticky="nw")
+        conf_os.grid(row=3, column=0, padx=10, pady=(25, 0), sticky="nw")
 
         conf_user = CTkLabel(pane, text=f"User: {conf_dic['user']}", font=("Arial", 16, "bold"), wraplength=100, justify="left")
-        conf_user.grid(row=4, column=0, padx=10, pady=(20, 5), sticky="nw")
+        conf_user.grid(row=4, column=0, padx=10, pady=(25, 0), sticky="nw")
 
         try:
             conf_remote = CTkLabel(pane, text=f"Remote: {conf_dic['remote']}", font=("Arial", 16, "bold"), wraplength=100, justify="left")
-            conf_remote.grid(row=5, column=0, padx=10, pady=(20, 0), sticky="nw")
+            conf_remote.grid(row=5, column=0, padx=10, pady=(25, 0), sticky="nw")
         except:
             conf_local = CTkLabel(pane, text="Local Scoring", font=("Arial", 16, "bold"), wraplength=100, justify="left")
-            conf_local.grid(row=5, column=0, padx=10, pady=(20, 0), sticky="nw")
+            conf_local.grid(row=5, column=0, padx=10, pady=(25, 0), sticky="nw")
+
+    def fill_right_pane(self, pane):
+        pane.grid_columnconfigure(0, weight=1)
+        pane.grid_columnconfigure(1, weight=1)
+
+        buttons_data = [
+            {"btn": "put here", "command": ""},
+            {"btn": "put here", "command": ""},
+            {"btn": "put here", "command": ""},
+            {"btn": "put here", "command": ""},
+            {"btn": "put here", "command": ""},
+            {"btn": "put here", "command": ""},
+            {"btn": "put here", "command": ""},
+            {"btn": "put here", "command": ""}
+        ]
+        for i, btn_data in enumerate(buttons_data):
+            button = CTkButton(pane, text=btn_data["btn"], command=btn_data["command"], height=45, font=("Arial", 16, "bold"))
+            button.grid(row=i//2, column=i%2, padx=10, pady=10, sticky="new")
+
+        resolve_btn = CTkButton(pane, text="Resolve", command="", height=60, font=("Bahnschrift", 20, "bold"), fg_color="#A00E1A", hover_color="#860A0A")
+        resolve_btn.grid(row=4, column=0, columnspan=2, padx=10, pady=10, sticky="ew")
+
+        build_btn = CTkButton(pane, text="Build", command="", height=80, font=("Bahnschrift", 20, "bold"))
+        build_btn.grid(row=5, column=0, columnspan=2, padx=10, pady=10, sticky="ew")
