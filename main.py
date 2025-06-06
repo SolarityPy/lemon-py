@@ -25,25 +25,26 @@ class App(ctk.CTk):
         file_path = filedialog.askopenfilename(
             filetypes=[("Config files", "*.conf"), ("Text files", "*.txt"), ("TOML files", "*.toml")]
         )
-        
-        # Only proceeds if file is chosen
         if file_path:
-            hub = Hub(self)
-            hub.create_buttons()
-            
-            
-            
-            
-            
-            
-            
-            '''
-            config = ConfigParser(file_path)
-            config_dictionary = config.parse()
-            
-            translator_object = Translator(config_dictionary, self)
-            translator_object.translate()
-            '''
+            self.start_screen(file_path)
+            #could add alert if not correct file path
+
+    def start_screen(self, file_path):
+        config = ConfigParser(file_path)
+        config_dictionary = config.parse()
+        # Force window update before creating hub
+        self.update_idletasks()
+        
+        hub = Hub(self)
+        hub.create_hub(config_dictionary)
+        
+        # Force layout recalculation
+        self.update_idletasks()
+
+        '''
+        translator_object = Translator(config_dictionary, self)
+        translator_object.translate()
+        '''
 
 # Initializes main loop
 app = App()
