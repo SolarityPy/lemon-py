@@ -5,6 +5,46 @@ from Prompt import Prompt
 class Commands:
     def __init__(self, root):
         self.root = root
+        # Move the commands dictionary here as a class attribute
+        self.commands = {
+            # === USER COMMANDS ===
+            # Note: https://www.tenforums.com/attachments/tutorial-test/142289d1499096195-change-user-rights-assignment-security-policy-settings-windows-10-a-ntrights.zip
+            # Only way to change user rights assignment is to use this program, first dependency :(
+                
+            "userexists": lambda commands_obj, p, not_bool: Command(f"net user {p['name']} /delete"),
+            "userexistsnot": lambda commands_obj, p, not_bool: Command(f"net user {p['name']} CyberPatriots1! /add"),
+            
+            "userdetail": lambda commands_obj, p, not_bool: self.user_detail_command(p, False),
+            "userdetailnot": lambda commands_obj, p, not_bool: self.user_detail_command(p, True),
+            
+            "useringroup": lambda commands_obj, p, not_bool: Command(f"net localgroup '{p['group']}' '{p['user']}' /delete"),
+            "useringroupnot": lambda commands_obj, p, not_bool: Command(f"net localgroup '{p['group']}' '{p['user']}' /add"),
+            
+            "userrights": lambda commands_obj, p, not_bool: Command(f"ntrights -r {p['value']} -u {p['name']}"),
+            "userrightsnot": lambda commands_obj, p, not_bool: Command(f"ntrights +r {p['value']} -u {p['name']}"),
+            
+            # === SECURITY COMMANDS ===
+            "firewallup": lambda commands_obj, p, not_bool: Command("netsh advfirewall set allprofiles state off"),
+            "firewallupnot": lambda commands_obj, p, not_bool: Command("netsh advfirewall set allprofiles state on"),
+            
+            # === WINDOWS FEATURES ===
+            "windowsfeature": lambda commands_obj, p, not_bool: Command(f"Dism /Online /Disable-Feature /FeatureName:{p['name']}"),
+            "windowsfeaturenot": lambda commands_obj, p, not_bool: Command(f"Dism /Online /Enable-Feature /FeatureName:{p['name']}"),
+            
+            # === SERVICES ===
+            "serviceup": lambda commands_obj, p, not_bool: Command(f"sc stop '{p['name']}'"),
+            "serviceupnot": lambda commands_obj, p, not_bool: Command(f"sc start '{p['name']}'"),
+
+            "servicestartup": lambda commands_obj, p, not_bool: Command(f"sc config '{p['name']}' start='{"disabled" if p['startup'] == 'automatic' else 'auto'}'"),
+            "servicestartupnot": lambda commands_obj, p, not_bool: Command(f"sc config '{p['name']}' start='{"auto" if p['startup'] == 'automatic' else 'disabled'}'"),
+            
+            "programinstalled": lambda commands_obj, p, not_bool: self.program_installed_command(p, False),
+            "programinstallednot": lambda commands_obj, p, not_bool: self.program_installed_command(p, True),
+
+            # === MISCELLANEOUS ===
+            "shareexists": lambda commands_obj, p, not_bool: self.share_exists_command(p, False),
+            "shareexistsnot": lambda commands_obj, p, not_bool: self.share_exists_command(p, True)
+        }
         
     # === COMPLEX COMMAND FUNCTIONS ===
 
@@ -63,12 +103,16 @@ class Commands:
 
     def share_exists_command(self, p, not_boolean):
         if not_boolean:
-            return Command(f"net share {p['name']}=#share_path#", True, ["What path would you like the share to broadcast?"]) # create a new share
+            return Command(
+                f"net share {p['name']}=#share_path#", 
+                prereq_required=True, 
+                open_ended_questions=["What path would you like the share to broadcast?"]
+            )
         else:
             return Command(f"net share {p['name']} /delete") # delete the share
         
 
-    def program_installed_command(self, p, not_boolean): # In the future, Lemon will ask the user for any required programs: Lemon will use this check as penalty
+    def program_installed_command(self, p, not_boolean):
         program_list = {
             "Firefox": {
                 "extension": "msi",
@@ -78,81 +122,38 @@ class Commands:
             },
 
             "CCleaner": {
-                "extemsion" : "msi",
-                "latest" : r"https://www.ccleaner.com/go/get_ccbe_msi",
+                "extension": "msi",
+                "latest": r"https://www.ccleaner.com/go/get_ccbe_msi",
                 "old": r"", #find later
                 "old_version": ""
             },
 
             "Notepad++": {
-                "extemsion" : "msi",
-                "latest" : r"",
+                "extension": "msi",
+                "latest": r"",
                 "old": r"", #find later
                 "old_version": ""
             }
         }
         
         for program in program_list.keys():
-            if (program.lower() in p['name'].lower()): # if Firefox is in Firefox Version 18.e.b   \ If firefix version 18.eb in firefox
-            
-                return Command(f"#{program}_msi_path# /qn", program_list, prereq_required=True, radio_button_options={
-                    "questions": [
-                        { # FOR FUTURE: DETECT IF EXISTING PROGRAMVERSIONNOT CHECKS ARE IMPLEMENTED FOR SAME PROGRAM
-                            "question": f"What version of {program} did you want to install?",
-                            "options": [
-                                f"Old Version ({program_list[program]['old_version']})", "Latest Version"
-                            ]
-                        }
-                    ]
-                })
-            
-
-
-            '''
-                    {
-                        "old": program_list[str(program)]['old'], "version": program_list[str(program)]['old_version']
-                    },
-                    {
-                        "new": program_list[str(program)]['latest'], "version": "latest"
+            if (program.lower() in p['name'].lower()):
+                return Command(
+                    f"#{program}_msi_path# /qn", 
+                    prereq_required=True, 
+                    supported_command_dict=program_list,
+                    radio_button_options={
+                        "questions": [
+                            {
+                                "question": f"What version of {program} did you want to install?",
+                                "options": [
+                                    f"Old Version ({program_list[program]['old_version']})", 
+                                    "Latest Version"
+                                ]
+                            }
+                        ]
                     }
-                ])'''
-
-    commands = {
-        # === USER COMMANDS ===
-        # Note: https://www.tenforums.com/attachments/tutorial-test/142289d1499096195-change-user-rights-assignment-security-policy-settings-windows-10-a-ntrights.zip
-        # Only way to change user rights assignment is to use this program, first dependency :(
-            
-        "userexists": lambda self, p: Command(f"net user {p['name']} /delete"),
-        "userexistsnot": lambda self, p: Command(f"net user {p['name']} CyberPatriots1! /add"),
+                )
         
-        "userdetail": lambda self, p, not_boolean: self.user_detail_command(p, not_boolean),
-        "userdetailnot": lambda self, p, not_boolean: self.user_detail_command(p, not_boolean),
-        
-        "useringroup": lambda self, p: Command(f"net localgroup '{p['group']}' '{p['user']}' /delete"),
-        "useringroupnot": lambda self, p: Command(f"net localgroup '{p['group']}' '{p['user']}' /add"),
-        
-        "userrights": lambda self, p: Command(f"ntrights -r {p['value']} -u {p['name']}"),
-        "userrightsnot": lambda self, p: Command(f"ntrights +r {p['value']} -u {p['name']}"),
-        
-        # === SECURITY COMMANDS ===
-        "firewallup": lambda self, p: Command("netsh advfirewall set allprofiles state off"),
-        "firewallupnot": lambda self, p: Command("netsh advfirewall set allprofiles state on"),
-        
-        # === WINDOWS FEATURES ===
-        "windowsfeature": lambda self, p: Command(f"Dism /Online /Disable-Feature /FeatureName:{p['name']}"),
-        "windowsfeaturenot": lambda self, p: Command(f"Dism /Online /Enable-Feature /FeatureName:{p['name']}"),
-        
-        # === SERVICES ===
-        "serviceup": lambda self, p: Command(f"sc stop '{p['name']}'"),
-        "serviceupnot": lambda self, p: Command(f"sc start '{p['name']}'"),
-
-        "servicestartup": lambda self, p: Command(f"sc config '{p['name']}' start='{"disabled" if p['startup'] == 'automatic' else 'auto'}'"),
-        "servicestartupnot": lambda self, p: Command(f"sc config '{p['name']}' start='{"auto" if p['startup'] == 'automatic' else 'disabled'}'"),
-        
-        "programinstalled": lambda self, p, not_boolean: self.program_installed_command(p, not_boolean),
-        "programinstallednot": lambda self, p, not_boolean: self.program_installed_command(p, not_boolean),
-
-        # === MISCELLANEOUS ===
-        "shareexists": lambda self, p, not_boolean: self.share_exists_command(p, not_boolean),
-        "shareexistsnot": lambda self, p, not_boolean: self.share_exists_command(p, not_boolean)
-    }
+        # Return None if no program found
+        return None

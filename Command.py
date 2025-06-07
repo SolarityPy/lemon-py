@@ -23,13 +23,52 @@ class Command:
         return self.prereq_questions_required
     
     def update_command_with_answer(self, question_index, answer):
+        # Handle dynamic program placeholders (e.g., #Firefox_msi_path#)
+        if self.supported_command_dict:
+            for program_name in self.supported_command_dict.keys():
+                program_placeholder = f"#{program_name}_msi_path#"
+                if program_placeholder in self.command_string:
+                    replacement = self._get_program_msi_path(program_name, answer)
+                    if replacement:
+                        self.command_string = self.command_string.replace(program_placeholder, replacement)
+        
+        # Handle standard placeholders
         for placeholder, handler_name in self.PLACEHOLDER_HANDLERS.items():
             if placeholder in self.command_string:
-                handler = getattr(self, handler_name)
-                replacement = handler(answer)
-                if replacement is not None:
-                    self.command_string = self.command_string.replace(placeholder, replacement)
+                handler = getattr(self, handler_name, None)
+                if handler:
+                    replacement = handler(answer)
+                    if replacement is not None:
+                        self.command_string = self.command_string.replace(placeholder, replacement)
     
     def _get_direct_replacement(self, answer):
         """For simple direct replacements"""
         return answer
+    
+    def _get_msi_path(self, answer):
+        """Generic MSI path handler"""
+        return None
+    
+    def _get_program_version(self, answer):
+        """Extract version from answer"""
+        if "Old Version" in answer:
+            import re
+            match = re.search(r'\((.*?)\)', answer)
+            return match.group(1) if match else "old"
+        elif "Latest Version" in answer:
+            return "latest"
+        return None
+    
+    def _get_program_msi_path(self, program_name, answer):
+        """Get the correct MSI path based on program and user answer"""
+        if not self.supported_command_dict or program_name not in self.supported_command_dict:
+            return None
+            
+        program_data = self.supported_command_dict[program_name]
+        
+        if "Old Version" in answer:
+            return program_data.get('old', '')
+        elif "Latest Version" in answer:
+            return program_data.get('latest', '')
+        
+        return None
