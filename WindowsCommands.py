@@ -141,7 +141,7 @@ class Commands:
                 return Command(
                     #standerdized all placeholders to #---_replace# for easier replacement
                     #also added & REM which allows additional storeage in the command by adding a comment to it
-                    #could've added another variable to command but i thought this was cooler 👍
+                    #could've added another variable to command class but i thought this was cooler 👍
                     f"msiexec /i #{program}_replace# /qn & REM program_installed", 
                     prereq_required=True, 
                     supported_dict=program_list,

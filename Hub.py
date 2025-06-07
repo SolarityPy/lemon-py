@@ -40,12 +40,6 @@ class Hub:
         right_pane.grid(row=0, column=2, sticky="nsew")
         self.fill_right_pane(right_pane, root)
 
-        '''
-        forensics_
-        apps_button = CTkButton(root, "Required Applications")
-        gp_button = CTkButton(root, "Group Policy")
-        '''
-    
     def fill_left_pane(self, pane, conf_dic):
         pane.grid_columnconfigure(0, weight=1)
 
@@ -92,8 +86,15 @@ class Hub:
         for i, btn_data in enumerate(buttons_data):
             button = CTkButton(pane, text=btn_data["btn"], command=btn_data["command"], height=45, font=("Arial", 16, "bold"))
             button.grid(row=i//2, column=i%2, padx=10, pady=10, sticky="new")
-
-        resolve_btn = CTkButton(pane, text="Resolve", command=lambda: self.open_resolve_mode(), height=60, font=("Bahnschrift", 20, "bold"), fg_color="#A00E1A", hover_color="#860A0A")
+        
+        is_resolved = True
+        for command_obj in self.command_objects_list:
+            if "#" in command_obj.get_command():
+                is_resolved = False
+        if (is_resolved):
+            resolve_btn = CTkButton(pane, text="Resolve", command=lambda: self.open_resolve_mode(), height=60, font=("Bahnschrift", 20, "bold"), fg_color="#0B6626", hover_color="#0E7416")
+        else:
+            resolve_btn = CTkButton(pane, text="Resolve", command=lambda: self.open_resolve_mode(), height=60, font=("Bahnschrift", 20, "bold"), fg_color="#A00E1A", hover_color="#860A0A")
         resolve_btn.grid(row=4, column=0, columnspan=2, padx=10, pady=10, sticky="ew")
 
         build_btn = CTkButton(pane, text="Build", command="", height=80, font=("Bahnschrift", 20, "bold"))

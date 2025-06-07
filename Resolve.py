@@ -13,6 +13,7 @@ class Resolve:
         else:
             self.user_answers = {}
         self.radio_var = tk.StringVar()  # Make it persistent
+        self.current_entry = None
 
     def clear_screen(self):
         for widget in self.root.winfo_children():
@@ -29,10 +30,11 @@ class Resolve:
             self.root.grid_rowconfigure(i, weight=1)
         
         # Center the question label
-        label = CTkLabel(self.root, text=question_dict['question'])
-        label.grid(row=0, column=0, columnspan=3, pady=20, sticky="n")
+        print(question_dict)
         
         if question_dict['type'] == "radio_options":
+            label = CTkLabel(self.root, text=question_dict['question'])
+            label.grid(row=0, column=0, columnspan=3, pady=20, sticky="n")
             # Restore previous answer if exists
             if self.index in self.user_answers:
                 self.radio_var.set(self.user_answers[self.index])
@@ -48,7 +50,17 @@ class Resolve:
                     value=option
                 )
                 radio_btn.grid(row=i+1, column=1, pady=5, padx=20, sticky="nswe")
-        
+        elif question_dict['type'] == "open_ended":
+            for question in question_dict['questions']:
+                label = CTkLabel(self.root, text=question)
+                label.grid(row=0, column=0, columnspan=3, pady=20, sticky="new")
+                
+                self.current_entry = CTkEntry(self.root, width=300, height=30)
+                self.current_entry.grid(row=1, column=1, pady=10, padx=20, sticky="ew")
+
+                if self.index in self.user_answers:
+                    self.current_entry.insert(0, self.user_answers[self.index])
+
         # Create buttons
         back_button = CTkButton(self.root, text="Back", height=30, width=120, command=self.decrease_index)
         escape_button = CTkButton(self.root, text="Escape", height=30, width=120, command=self.resolve_escape)
@@ -118,12 +130,20 @@ class Resolve:
         self.create_resolve()
 
     def save_current_answer(self):
-        #Save current selection before navigating
-        current_answer = self.radio_var.get()
-        if current_answer:
-            self.user_answers[self.index] = current_answer
-            # Update commands immediately when answer changes
-            self.update_commands_with_answers()
+        #save current selection before navigating
+        question_dict = self.question_formatted_list[self.index - 1]
+        
+        if question_dict['type'] == "radio_options":
+            current_answer = self.radio_var.get()
+            if current_answer:
+                self.user_answers[self.index] = current_answer
+        elif question_dict['type'] == "open_ended":
+            if self.current_entry:
+                    current_answer = self.current_entry.get()
+                    if current_answer:
+                        self.user_answers[self.index] = current_answer
+        # update commands when answer changes
+        self.update_commands_with_answers()
 
     def update_commands_with_answers(self):
         """Update command strings based on current user answers"""
@@ -132,24 +152,22 @@ class Resolve:
             if command_obj.get_prereq_required():
                 if command_obj.radio_button_options:
                     for radio_option in command_obj.radio_button_options['questions']:
-                        print(radio_option)
                         if question_index in self.user_answers:
                             answer = self.user_answers[question_index] 
                             
-                            command_obj.update_command_with_answer(question_index, answer)
+                            command_obj.update_command_with_answer(answer)
                         question_index += 1
 
                 elif command_obj.open_ended_questions:
                     for question in command_obj.open_ended_questions:
-                        print(question)
                         if question_index in self.user_answers:
                             answer = self.user_answers[question_index]
                             
-                            command_obj.update_command_with_answer(question_index, answer)
+                            command_obj.update_command_with_answer(answer)
                         question_index += 1
         
-        # Print updated commands after each answer
-        print("=== UPDATED COMMANDS ===")
+        # Print updated commands after each answer so we like know what were doing
+        print("=== UPDATED COMMANDS AFTER USER INPUT ===")
         for i, command_obj in enumerate(self.command_obj_list):
             print(f"Command {i+1}: {command_obj.get_command()}")
         print()

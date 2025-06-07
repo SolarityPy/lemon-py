@@ -1,10 +1,11 @@
 class Command:
     placeholder_handlers = {
         #add placeholders that dont need a supported_dict
-        "#share_path#": "get_answer"
+        "#share_replace#": "get_answer"
     }
     
     def __init__(self, command_string, prereq_required=False, supported_dict=None, open_ended_questions=None, radio_button_options=None):
+        self.original_command = command_string
         self.command_string = command_string
         self.prereq_questions_required = prereq_required # Boolean: True or False
         self.supported_dict = supported_dict
@@ -20,7 +21,8 @@ class Command:
     def get_prereq_required(self):
         return self.prereq_questions_required
     
-    def update_command_with_answer(self, question_index, answer):
+    def update_command_with_answer(self, answer):
+        self.reset_command()
         # installed command handleing will need something similer for all other ones that need a dictionary
         # other than that can use the placeholder_handler
         # TLDR: first part is for handling of dictionaries of dictionaries and second is for handling non-dictionary (supported_dict=None) placeholders
@@ -45,14 +47,18 @@ class Command:
     def get_replacement(self, key, answer):
         if ('program_installed' in self.command_string):
             return self.get_program_msi(key, answer)
-        
-    def get_program_msi(self, key, answer):
-        program = self.supported_dict[key]
-        if ('Old version' in answer):
-            return program['old']
-        else:
-            return program['latest']
 
+    def get_program_msi(self, key, answer):
+        if key in self.supported_dict:
+            program = self.supported_dict[key]
+            if 'Old Version' in answer:
+                return program['old']
+            else:
+                return program['latest']
+        return None
 
     def get_answer(self, answer):
         return answer
+    
+    def reset_command(self):
+        self.command_string = self.original_command
