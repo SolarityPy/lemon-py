@@ -116,3 +116,19 @@ class Resolve:
         current_answer = self.radio_var.get()
         if current_answer:
             self.user_answers[self.index] = current_answer
+            # Update commands immediately when answer changes
+            self.update_commands_with_answers()
+
+    def update_commands_with_answers(self):
+        """Update command strings based on current user answers"""
+        question_index = 1
+        for command_obj in self.command_obj_list:
+            if command_obj.get_prereq_required():
+                if command_obj.radio_button_options:
+                    for radio_option in command_obj.radio_button_options['questions']:
+                        if question_index in self.user_answers:
+                            answer = self.user_answers[question_index]
+                            # Update the command string based on the answer
+                            command_obj.update_command_with_answer(question_index, answer)
+                        question_index += 1
+                # Handle open_ended_questions similarly if needed

@@ -60,17 +60,6 @@ class Commands:
                     return Command(f"net user '{p['user']}' /PasswordChg:No")
                 else:
                     return Command(f"net user '{p['user']}' /PasswordChg:Yes")
-    
-
-    def download(self, path, url):
-        r = requests.get(url)
-        if r.status_code == 200:
-            with open(path, 'wb') as file:
-                file.write(r.content)
-                return True
-        else:
-            return None    
-        
 
     def share_exists_command(self, p, not_boolean):
         if not_boolean:
@@ -106,7 +95,7 @@ class Commands:
         for program in program_list.keys():
             if (program.lower() in p['name'].lower()): # if Firefox is in Firefox Version 18.e.b   \ If firefix version 18.eb in firefox
             
-                return Command("#file_msi_path# /qn", prereq_required=True, radio_button_options={
+                return Command(f"#{program}_msi_path# /qn", program_list, prereq_required=True, radio_button_options={
                     "questions": [
                         { # FOR FUTURE: DETECT IF EXISTING PROGRAMVERSIONNOT CHECKS ARE IMPLEMENTED FOR SAME PROGRAM
                             "question": f"What version of {program} did you want to install?",
