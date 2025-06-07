@@ -59,8 +59,11 @@ class Resolve:
             back_button.grid(row=4, column=0, padx=20, pady=10, sticky="ws")
         else:
             escape_button.grid(row=4, column=0, padx=20, pady=10, sticky="ws")
-        if self.index < len(self.question_formatted_list):
+
+        if  self.index < len(self.question_formatted_list):
             next_button.grid(row=4, column=2, padx=(20,0), pady=10, sticky="se")
+        else:
+            escape_button.grid(row=4, column=2, padx=(20,0), pady=10, sticky="se")
 
     def init(self): 
         self.root.geometry("600x450")
@@ -91,6 +94,8 @@ class Resolve:
         self.update_screen()  # This will now create everything including buttons
 
     def resolve_escape(self):
+        self.save_current_answer()
+        self.update_commands_with_answers()
         self.hub_callback(self.user_answers)
     def resolve(self):
         for command_obj in self.command_obj_list:
@@ -131,4 +136,9 @@ class Resolve:
                             # Update the command string based on the answer
                             command_obj.update_command_with_answer(question_index, answer)
                         question_index += 1
-                # Handle open_ended_questions similarly if needed
+        
+        # Print updated commands after each answer
+        print("=== UPDATED COMMANDS ===")
+        for i, command_obj in enumerate(self.command_obj_list):
+            print(f"Command {i+1}: {command_obj.get_command()}")
+        print()

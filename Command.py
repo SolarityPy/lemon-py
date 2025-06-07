@@ -1,7 +1,5 @@
 class Command:
-    # Class-level replacement mappings
     PLACEHOLDER_HANDLERS = {
-        "#file_msi_path#": "_get_msi_path",
         "#share_path#": "_get_direct_replacement", 
         "#program_version#": "_get_program_version"
     }
@@ -44,11 +42,7 @@ class Command:
     def _get_direct_replacement(self, answer):
         """For simple direct replacements"""
         return answer
-    
-    def _get_msi_path(self, answer):
-        """Generic MSI path handler"""
-        return None
-    
+
     def _get_program_version(self, answer):
         """Extract version from answer"""
         if "Old Version" in answer:

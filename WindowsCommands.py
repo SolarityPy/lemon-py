@@ -124,15 +124,15 @@ class Commands:
             "CCleaner": {
                 "extension": "msi",
                 "latest": r"https://www.ccleaner.com/go/get_ccbe_msi",
-                "old": r"", #find later
-                "old_version": ""
+                "old": r"test2", #find later
+                "old_version": "test3"
             },
 
             "Notepad++": {
                 "extension": "msi",
-                "latest": r"",
-                "old": r"", #find later
-                "old_version": ""
+                "latest": r"test4",
+                "old": r"test5", #find later
+                "old_version": "test6"
             }
         }
         
@@ -155,5 +155,4 @@ class Commands:
                     }
                 )
         
-        # Return None if no program found
         return None
