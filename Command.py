@@ -1,13 +1,13 @@
 class Command:
-    PLACEHOLDER_HANDLERS = {
-        "#share_path#": "_get_direct_replacement", 
-        "#program_version#": "_get_program_version"
+    placeholder_handlers = {
+        #add placeholders that dont need a supported_dict
+        "#share_path#": "get_answer"
     }
     
-    def __init__(self, command_string, prereq_required=False, supported_command_dict=None, open_ended_questions=None, radio_button_options=None):
+    def __init__(self, command_string, prereq_required=False, supported_dict=None, open_ended_questions=None, radio_button_options=None):
         self.command_string = command_string
         self.prereq_questions_required = prereq_required # Boolean: True or False
-        self.supported_command_dict = supported_command_dict
+        self.supported_dict = supported_dict
         self.radio_button_options = radio_button_options
         self.open_ended_questions = open_ended_questions
         
@@ -21,48 +21,38 @@ class Command:
         return self.prereq_questions_required
     
     def update_command_with_answer(self, question_index, answer):
-        # Handle dynamic program placeholders (e.g., #Firefox_msi_path#)
-        if self.supported_command_dict:
-            for program_name in self.supported_command_dict.keys():
-                program_placeholder = f"#{program_name}_msi_path#"
-                if program_placeholder in self.command_string:
-                    replacement = self._get_program_msi_path(program_name, answer)
+        # installed command handleing will need something similer for all other ones that need a dictionary
+        # other than that can use the placeholder_handler
+        # TLDR: first part is for handling of dictionaries of dictionaries and second is for handling non-dictionary (supported_dict=None) placeholders
+        if self.supported_dict:
+            for dict_key in self.supported_dict.keys():
+                dict_placeholder = f"#{dict_key}_replace#"
+                if dict_placeholder in self.command_string:
+                    replacement = self.get_replacement(dict_key, answer)
                     if replacement:
-                        self.command_string = self.command_string.replace(program_placeholder, replacement)
+                        self.command_string = self.command_string.replace(dict_placeholder, replacement)
         
-        # Handle standard placeholders
-        for placeholder, handler_name in self.PLACEHOLDER_HANDLERS.items():
+        # handle standard placeholders
+        for placeholder, handler_name in self.placeholder_handlers.items():
             if placeholder in self.command_string:
+                #returns method - allows different standard placeholders to call different methods
                 handler = getattr(self, handler_name, None)
                 if handler:
                     replacement = handler(answer)
                     if replacement is not None:
                         self.command_string = self.command_string.replace(placeholder, replacement)
     
-    def _get_direct_replacement(self, answer):
-        """For simple direct replacements"""
-        return answer
+    def get_replacement(self, key, answer):
+        if ('program_installed' in self.command_string):
+            return self.get_program_msi(key, answer)
+        
+    def get_program_msi(self, key, answer):
+        program = self.supported_dict[key]
+        if ('Old version' in answer):
+            return program['old']
+        else:
+            return program['latest']
 
-    def _get_program_version(self, answer):
-        """Extract version from answer"""
-        if "Old Version" in answer:
-            import re
-            match = re.search(r'\((.*?)\)', answer)
-            return match.group(1) if match else "old"
-        elif "Latest Version" in answer:
-            return "latest"
-        return None
-    
-    def _get_program_msi_path(self, program_name, answer):
-        """Get the correct MSI path based on program and user answer"""
-        if not self.supported_command_dict or program_name not in self.supported_command_dict:
-            return None
-            
-        program_data = self.supported_command_dict[program_name]
-        
-        if "Old Version" in answer:
-            return program_data.get('old', '')
-        elif "Latest Version" in answer:
-            return program_data.get('latest', '')
-        
-        return None
+
+    def get_answer(self, answer):
+        return answer

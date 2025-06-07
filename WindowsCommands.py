@@ -104,7 +104,7 @@ class Commands:
     def share_exists_command(self, p, not_boolean):
         if not_boolean:
             return Command(
-                f"net share {p['name']}=#share_path#", 
+                f"net share {p['name']}=#share_replace# & REM share_exists", 
                 prereq_required=True, 
                 open_ended_questions=["What path would you like the share to broadcast?"]
             )
@@ -124,14 +124,14 @@ class Commands:
             "CCleaner": {
                 "extension": "msi",
                 "latest": r"https://www.ccleaner.com/go/get_ccbe_msi",
-                "old": r"test2", #find later
+                "old": r"old", #find later
                 "old_version": "test3"
             },
 
             "Notepad++": {
                 "extension": "msi",
-                "latest": r"test4",
-                "old": r"test5", #find later
+                "latest": r"new",
+                "old": r"old", #find later
                 "old_version": "test6"
             }
         }
@@ -139,9 +139,12 @@ class Commands:
         for program in program_list.keys():
             if (program.lower() in p['name'].lower()):
                 return Command(
-                    f"#{program}_msi_path# /qn", 
+                    #standerdized all placeholders to #---_replace# for easier replacement
+                    #also added & REM which allows additional storeage in the command by adding a comment to it
+                    #could've added another variable to command but i thought this was cooler 👍
+                    f"msiexec /i #{program}_replace# /qn & REM program_installed", 
                     prereq_required=True, 
-                    supported_command_dict=program_list,
+                    supported_dict=program_list,
                     radio_button_options={
                         "questions": [
                             {

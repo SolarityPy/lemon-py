@@ -97,6 +97,7 @@ class Resolve:
         self.save_current_answer()
         self.update_commands_with_answers()
         self.hub_callback(self.user_answers)
+
     def resolve(self):
         for command_obj in self.command_obj_list:
             if (command_obj.get_prereq_required()):
@@ -126,14 +127,24 @@ class Resolve:
 
     def update_commands_with_answers(self):
         """Update command strings based on current user answers"""
-        question_index = 1
+        question_index = 1 #starts at one to match indexing of user_answers {1: "answer" , 2: "answer2", ect.}
         for command_obj in self.command_obj_list:
             if command_obj.get_prereq_required():
                 if command_obj.radio_button_options:
                     for radio_option in command_obj.radio_button_options['questions']:
+                        print(radio_option)
+                        if question_index in self.user_answers:
+                            answer = self.user_answers[question_index] 
+                            
+                            command_obj.update_command_with_answer(question_index, answer)
+                        question_index += 1
+
+                elif command_obj.open_ended_questions:
+                    for question in command_obj.open_ended_questions:
+                        print(question)
                         if question_index in self.user_answers:
                             answer = self.user_answers[question_index]
-                            # Update the command string based on the answer
+                            
                             command_obj.update_command_with_answer(question_index, answer)
                         question_index += 1
         
