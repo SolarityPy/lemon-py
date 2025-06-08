@@ -103,7 +103,7 @@ class Commands:
     def share_exists_command(self, p, not_boolean):
         if not_boolean:
             return Command(
-                f"net share {p['name']}=#share_replace# & REM share_exists", 
+                f"net share {p['name']}='#share_replace#' & REM share_exists", 
                 prereq_required=True, 
                 open_ended_questions=["What path would you like the share to broadcast?"]
             )

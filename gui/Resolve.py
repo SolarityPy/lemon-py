@@ -21,45 +21,49 @@ class Resolve:
             
     def update_screen(self):
         self.clear_screen()
-        question_dict = self.question_formatted_list[self.index - 1]
-        
-        # Configure grid once
-        for i in range(3):
-            self.root.grid_columnconfigure(i, weight=1)
-        for i in range(5):
-            self.root.grid_rowconfigure(i, weight=1)
-        
-        # Center the question label
-        print(question_dict)
-        
-        if question_dict['type'] == "radio_options":
-            label = CTkLabel(self.root, text=question_dict['question'])
-            label.grid(row=0, column=0, columnspan=3, pady=20, sticky="n")
-            # Restore previous answer if exists
-            if self.index in self.user_answers:
-                self.radio_var.set(self.user_answers[self.index])
-            else:
-                self.radio_var.set("")
+        try:
+            question_dict = self.question_formatted_list[self.index - 1]
             
-            # Center the radio buttons
-            for i, option in enumerate(question_dict['options']):
-                radio_btn = CTkRadioButton(
-                    self.root,
-                    text=option,
-                    variable=self.radio_var,
-                    value=option
-                )
-                radio_btn.grid(row=i+1, column=1, pady=5, padx=20, sticky="nswe")
-        elif question_dict['type'] == "open_ended":
-            for question in question_dict['questions']:
-                label = CTkLabel(self.root, text=question)
-                label.grid(row=0, column=0, columnspan=3, pady=20, sticky="new")
-                
-                self.current_entry = CTkEntry(self.root, width=300, height=30)
-                self.current_entry.grid(row=1, column=1, pady=10, padx=20, sticky="ew")
-
+            # Configure grid once
+            for i in range(3):
+                self.root.grid_columnconfigure(i, weight=1)
+            for i in range(5):
+                self.root.grid_rowconfigure(i, weight=1)
+            
+            # Center the question label
+            print(question_dict)
+            
+            if question_dict['type'] == "radio_options":
+                label = CTkLabel(self.root, text=question_dict['question'])
+                label.grid(row=0, column=0, columnspan=3, pady=20, sticky="n")
+                # Restore previous answer if exists
                 if self.index in self.user_answers:
-                    self.current_entry.insert(0, self.user_answers[self.index])
+                    self.radio_var.set(self.user_answers[self.index])
+                else:
+                    self.radio_var.set("")
+                
+                # Center the radio buttons
+                for i, option in enumerate(question_dict['options']):
+                    radio_btn = CTkRadioButton(
+                        self.root,
+                        text=option,
+                        variable=self.radio_var,
+                        value=option
+                    )
+                    radio_btn.grid(row=i+1, column=1, pady=5, padx=20, sticky="nswe")
+            elif question_dict['type'] == "open_ended":
+                for question in question_dict['questions']:
+                    label = CTkLabel(self.root, text=question)
+                    label.grid(row=0, column=0, columnspan=3, pady=20, sticky="new")
+                    
+                    self.current_entry = CTkEntry(self.root, width=300, height=30)
+                    self.current_entry.grid(row=1, column=1, pady=10, padx=20, sticky="ew")
+
+                    if self.index in self.user_answers:
+                        self.current_entry.insert(0, self.user_answers[self.index])
+        except:
+            nothing_label = CTkLabel(self.root, text="*You have nothing to resolve*", font=("Arial", 25, "bold"))
+            nothing_label.place(relx=0.5, rely=0.45, anchor="center")
 
         # Create buttons
         back_button = CTkButton(self.root, text="Back", height=30, width=120, command=self.decrease_index)
@@ -106,9 +110,11 @@ class Resolve:
         self.update_screen()  # This will now create everything including buttons
 
     def resolve_escape(self):
-        self.save_current_answer()
-        self.update_commands_with_answers()
-        self.hub_callback(self.user_answers)
+        try:
+            self.save_current_answer()
+            self.update_commands_with_answers()
+        finally:
+            self.hub_callback(self.user_answers)
 
     def resolve(self):
         for command_obj in self.command_obj_list:

@@ -1,6 +1,7 @@
 from customtkinter import CTk, CTkLabel, CTkButton, CTkEntry, CTkFrame, CTkScrollableFrame, CTkImage
 from PIL import Image
 from gui.Resolve import Resolve
+from gui.EditCommands import EditCommands
 
 class Hub:
     def __init__(self, root, command_objects_list, resolve_answers=None):
@@ -81,10 +82,10 @@ class Hub:
             {"btn": "put here", "command": ""},
             {"btn": "put here", "command": ""},
             {"btn": "put here", "command": ""},
-            {"btn": "Edit Commands", "command": ""}
+            {"btn": "Edit Commands", "command": self.open_edit_mode}
         ]
         for i, btn_data in enumerate(buttons_data):
-            button = CTkButton(pane, text=btn_data["btn"], command=btn_data["command"], height=45, font=("Arial", 16, "bold"))
+            button = CTkButton(pane, text=btn_data["btn"], command=btn_data['command'], height=45, font=("Arial", 16, "bold"))
             button.grid(row=i//2, column=i%2, padx=10, pady=10, sticky="new")
         
         is_resolved = True
@@ -110,3 +111,11 @@ class Hub:
         # Pass this callback to Resolve
         resolve = Resolve(self.root, self.command_objects_list, hub_callback, self.resolve_answers)
         resolve.resolve()
+
+    def open_edit_mode(self):
+        def hub_callback():
+            self.clear_screen()
+            self.create_hub(self.conf_dic)
+
+        edit = EditCommands(self.root, self.command_objects_list, hub_callback)
+        edit.create_EditCommands()
