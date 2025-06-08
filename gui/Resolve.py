@@ -30,9 +30,6 @@ class Resolve:
             for i in range(5):
                 self.root.grid_rowconfigure(i, weight=1)
             
-            # Center the question label
-            print(question_dict)
-            
             if question_dict['type'] == "radio_options":
                 label = CTkLabel(self.root, text=question_dict['question'])
                 label.grid(row=0, column=0, columnspan=3, pady=20, sticky="n")
@@ -42,7 +39,6 @@ class Resolve:
                 else:
                     self.radio_var.set("")
                 
-                # Center the radio buttons
                 for i, option in enumerate(question_dict['options']):
                     radio_btn = CTkRadioButton(
                         self.root,
@@ -59,9 +55,11 @@ class Resolve:
                     self.current_entry = CTkEntry(self.root, width=300, height=30)
                     self.current_entry.grid(row=1, column=1, pady=10, padx=20, sticky="ew")
 
+                    #saves answer for later resoration
                     if self.index in self.user_answers:
                         self.current_entry.insert(0, self.user_answers[self.index])
         except:
+            #accounts for case where user has nothing to resolve i.e. no user input needed
             nothing_label = CTkLabel(self.root, text="*You have nothing to resolve*", font=("Arial", 25, "bold"))
             nothing_label.place(relx=0.5, rely=0.45, anchor="center")
 
@@ -111,6 +109,7 @@ class Resolve:
 
     def resolve_escape(self):
         try:
+            #same thing handles case where no user input needed so obiously it cant save a answer
             self.save_current_answer()
             self.update_commands_with_answers()
         finally:
@@ -138,11 +137,12 @@ class Resolve:
     def save_current_answer(self):
         #save current selection before navigating
         question_dict = self.question_formatted_list[self.index - 1]
-        
+        #saves radio options
         if question_dict['type'] == "radio_options":
             current_answer = self.radio_var.get()
             if current_answer:
                 self.user_answers[self.index] = current_answer
+        #saves open ended questions
         elif question_dict['type'] == "open_ended":
             if self.current_entry:
                     current_answer = self.current_entry.get()
@@ -160,7 +160,7 @@ class Resolve:
                     for radio_option in command_obj.radio_button_options['questions']:
                         if question_index in self.user_answers:
                             answer = self.user_answers[question_index] 
-                            
+                            #calls update command in command class with radio button
                             command_obj.update_command_with_answer(answer)
                         question_index += 1
 
@@ -168,11 +168,11 @@ class Resolve:
                     for question in command_obj.open_ended_questions:
                         if question_index in self.user_answers:
                             answer = self.user_answers[question_index]
-                            
+                            #calls update in command class with open ended
                             command_obj.update_command_with_answer(answer)
                         question_index += 1
         
-        # Print updated commands after each answer so we like know what were doing
+        #print updated commands after each answer so we like know what were doing
         print("=== UPDATED COMMANDS AFTER USER INPUT ===")
         for i, command_obj in enumerate(self.command_obj_list):
             print(f"Command {i+1}: {command_obj.get_command()}")

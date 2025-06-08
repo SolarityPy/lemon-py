@@ -48,10 +48,12 @@ class Command:
                         self.command_string = self.command_string.replace(placeholder, replacement)
     
     def get_replacement(self, key, answer):
+        #add more if staments for other dictionary requiring commands
         if ('program_installed' in self.command_string):
             return self.get_program_msi(key, answer)
 
     def get_program_msi(self, key, answer):
+        #specifically for program installed will only be used for that
         if key in self.supported_dict:
             program = self.supported_dict[key]
             if 'Old Version' in answer:
@@ -61,7 +63,9 @@ class Command:
         return None
 
     def get_answer(self, answer):
+        #allows dictionaried placeholders to acsess their answer
         return answer
     
     def reset_command(self):
+        #called when changing a answer in resolve because it needs the placeholder to replace with new value
         self.command_string = self.original_command

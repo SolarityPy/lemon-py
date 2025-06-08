@@ -103,6 +103,8 @@ class Commands:
     def share_exists_command(self, p, not_boolean):
         if not_boolean:
             return Command(
+                #standerdized all placeholders to #---_replace# for easier replacement
+                #if you want more info on this go down like 20 lines
                 f"net share {p['name']}='#share_replace#' & REM share_exists", 
                 prereq_required=True, 
                 open_ended_questions=["What path would you like the share to broadcast?"]
@@ -141,6 +143,7 @@ class Commands:
                     #standerdized all placeholders to #---_replace# for easier replacement
                     #also added & REM which allows additional storeage in the command by adding a comment to it
                     #could've added another variable to command class but i thought this was cooler 👍
+                    #the reason for this change is that it allows us to dynamically change based on the name bc then we know what program they want and such
                     f"msiexec /i #{program}_replace# /qn & REM program_installed", 
                     prereq_required=True, 
                     supported_dict=program_list,
