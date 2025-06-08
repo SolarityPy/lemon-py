@@ -50,7 +50,7 @@ class EditCommands:
 
                 self.edit_entry = CTkTextbox(self.scroll_frame, width=100, height=required_height, wrap="word")
                 self.edit_entry.grid(row=i, column=1, padx=5, pady=10, sticky="we")
-                self.edit_entry.insert("1.0", command.get_command())
+                self.edit_entry.insert("1.0", command_string)
                 #finish button saves edit and its also a different color so they know to click it
                 #partial is like lambda but it avoids problem where it only edits the last command bc it doesn't remeber anything past the last command
                 finish_btn = CTkButton(self.scroll_frame, text="Finish", 
@@ -98,7 +98,14 @@ class EditCommands:
         new_command = self.edit_entry.get("1.0", "end-1c")
         #makes sure that a command cannot be blank
         if new_command != "":
-            command.set_command(new_command)
+            original_command = command.get_command()
+            if "& REM" in original_command:
+                # Find the "& REM" part and preserve it
+                amp_index = original_command.find("&")
+                rem_part = original_command[amp_index:]
+                command.set_command(new_command + " " + rem_part)
+            else:
+                command.set_command(new_command)
         self.create_EditCommands()
 
     def delete_command(self, del_command):
