@@ -15,6 +15,9 @@ class Command:
     def get_command(self):
         return self.command_string
     
+    def set_command(self, command_string):
+        self.command_string = command_string
+    
     def get_prerequesite_commands(self):
         return self.prereq_commands
     

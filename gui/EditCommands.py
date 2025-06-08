@@ -1,10 +1,12 @@
 from customtkinter import CTk, CTkLabel, CTkButton, CTkEntry, CTkFrame, CTkScrollableFrame, CTkImage
+from functools import partial
 
 class EditCommands:
     def __init__(self, root, command_object_list, hub_callback):
         self.root = root
         self.command_object_list = command_object_list
         self.hub_callback = hub_callback
+        self.edit_entry = None
 
     def clear_screen(self):
         for widget in self.root.winfo_children():
@@ -16,7 +18,7 @@ class EditCommands:
         self.scroll_frame = CTkScrollableFrame(self.root, width=650, height=450)
         self.scroll_frame.grid(row=0, column=0, sticky="nsew")
 
-    def create_EditCommands(self):
+    def create_EditCommands(self, editing_command=None):
         self.init()
 
         self.scroll_frame.columnconfigure(0, weight=1)
@@ -32,17 +34,38 @@ class EditCommands:
 
             #this avoids a bug where it cuts of the last letter of a normal command with no user input bc find returns -1 and it does [0:-1]
             if command.get_command().find("&") != -1:
-                command_string = command.get_command()[0:command.get_command().find("&")]
+                command_string = command.get_command()[0:command.get_command().find("& REM")]
             else:
                 command_string = command.get_command()
 
-            command_text = CTkLabel(self.scroll_frame, text=f"Command: {command_string}", font=("Arial", 16))
-            command_text.grid(row=i, column=0, columnspan=2, padx=10, pady=5, sticky="we")
+            if editing_command and (command.get_command() in editing_command or editing_command in command.get_command()):
+                command_text = CTkLabel(self.scroll_frame, text=f"Command:", font=("Arial", 16))
+                command_text.grid(row=i, column=0, padx=10, pady=5, sticky="we")
 
-            edit_btn = CTkButton(self.scroll_frame, text="Edit", command=lambda: self.edit_command(), height=30, width=50, font=("Arial", 16, "bold"))
-            edit_btn.grid(row=i+1, column=0, padx=10, pady=5, sticky="we")
+                self.edit_entry = CTkEntry(self.scroll_frame, width=100, height=30)
+                self.edit_entry.grid(row=i, column=1, padx=5, pady=10, sticky="we")
+                self.edit_entry.insert(0, command.get_command())
 
-            delete_btn = CTkButton(self.scroll_frame, text="Delete", command=lambda: self.delete_command(command.get_command()), height=30, width=50, font=("Arial", 16, "bold"))
+                finish_btn = CTkButton(self.scroll_frame, text="Finish", 
+                    command=partial(self.finish_command, command), 
+                    height=30, width=50, font=("Arial", 16, "bold"), fg_color="#191970", border_width=2)
+                finish_btn.grid(row=i+1, column=0, padx=10, pady=5, sticky="we")
+            else:
+                command_text = CTkLabel(self.scroll_frame, text=f"Command:", font=("Arial", 16))
+                command_text.grid(row=i, column=0, padx=10, pady=5, sticky="we")
+
+                command_string = CTkLabel(self.scroll_frame, text=f"{command_string}", font=("Arial", 16))
+                command_string.grid(row=i, column=1, padx=10, pady=5, sticky="ew")
+
+            #had to use this library bc when using lambda it calls the final value from the loop
+                edit_btn = CTkButton(self.scroll_frame, text="Edit", 
+                        command=partial(self.edit_command, command.get_command()), 
+                        height=30, width=50, font=("Arial", 16, "bold"))
+                edit_btn.grid(row=i+1, column=0, padx=10, pady=5, sticky="we")
+
+            delete_btn = CTkButton(self.scroll_frame, text="Delete", 
+                    command=partial(self.delete_command, command.get_command()), 
+                    height=30, width=50, font=("Arial", 16, "bold"))
             delete_btn.grid(row=i+1, column=1, padx=10, pady=5, sticky="we")
             
             i += 2
@@ -58,8 +81,12 @@ class EditCommands:
         print()
         self.hub_callback()
 
-    def edit_command(self):
-        pass
+    def edit_command(self, edit_command):
+        self.create_EditCommands(edit_command)
+
+    def finish_command(self, command):
+        command.set_command(self.edit_entry.get())
+        self.create_EditCommands()
 
     def delete_command(self, del_command):
         for command in self.command_object_list:
