@@ -97,7 +97,7 @@ class EditCommands:
         #sets command to the right command and then sets editcommand back to original with new command
         new_command = self.edit_entry.get("1.0", "end-1c")
         #makes sure that a command cannot be blank
-        if new_command is not "":
+        if new_command != "":
             command.set_command(new_command)
         self.create_EditCommands()
 
