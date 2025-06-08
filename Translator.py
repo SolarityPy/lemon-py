@@ -1,6 +1,6 @@
 import json, os
 if os.name == "nt":
-    from WindowsCommands import Commands
+    from commands.WindowsCommands import Commands
 else:
     from LinuxCommands import Commands
     
@@ -9,10 +9,6 @@ class Translator:
         self.config_dictionary = config_dictionary 
         self.commands_list = [] 
         self.root = root
-        
-        with open("check_types.json",  "r") as f:
-            #dictionary that contains all Aeacus check types stored in a json file
-            self.types_dictionary = json.load(f)
 
     def translate(self):
         for check in self.config_dictionary['check']:

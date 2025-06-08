@@ -1,6 +1,5 @@
 import subprocess, os, requests
-from Command import Command
-from Prompt import Prompt
+from commands.Command import Command
 
 class Commands:
     def __init__(self, root):

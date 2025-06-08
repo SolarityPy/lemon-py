@@ -1,7 +1,7 @@
 import customtkinter as ctk
 from ConfigParser import ConfigParser
 from Translator import Translator
-from Hub import Hub
+from gui.Hub import Hub
 from tkinter import filedialog
 
 class App(ctk.CTk):

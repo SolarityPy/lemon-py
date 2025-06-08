@@ -1,6 +1,6 @@
 from customtkinter import CTk, CTkLabel, CTkButton, CTkEntry, CTkFrame, CTkScrollableFrame, CTkImage
 from PIL import Image
-from Resolve import Resolve
+from gui.Resolve import Resolve
 
 class Hub:
     def __init__(self, root, command_objects_list, resolve_answers=None):
@@ -74,14 +74,14 @@ class Hub:
         pane.grid_columnconfigure(1, weight=1)
 
         buttons_data = [
+            {"btn": "Security Policy", "command": ""},
+            {"btn": "User Management", "command": ""},
+            {"btn": "Group Policy", "command": ""},
+            {"btn": "Registry", "command": ""},
             {"btn": "put here", "command": ""},
             {"btn": "put here", "command": ""},
             {"btn": "put here", "command": ""},
-            {"btn": "put here", "command": ""},
-            {"btn": "put here", "command": ""},
-            {"btn": "put here", "command": ""},
-            {"btn": "put here", "command": ""},
-            {"btn": "put here", "command": ""}
+            {"btn": "Edit Commands", "command": ""}
         ]
         for i, btn_data in enumerate(buttons_data):
             button = CTkButton(pane, text=btn_data["btn"], command=btn_data["command"], height=45, font=("Arial", 16, "bold"))
@@ -91,7 +91,7 @@ class Hub:
         for command_obj in self.command_objects_list:
             if "#" in command_obj.get_command():
                 is_resolved = False
-        if (is_resolved):
+        if is_resolved:
             resolve_btn = CTkButton(pane, text="Resolve", command=lambda: self.open_resolve_mode(), height=60, font=("Bahnschrift", 20, "bold"), fg_color="#0B6626", hover_color="#0E7416")
         else:
             resolve_btn = CTkButton(pane, text="Resolve", command=lambda: self.open_resolve_mode(), height=60, font=("Bahnschrift", 20, "bold"), fg_color="#A00E1A", hover_color="#860A0A")
