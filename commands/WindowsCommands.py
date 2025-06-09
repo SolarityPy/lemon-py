@@ -105,7 +105,7 @@ class Commands:
             return Command(
                 #standerdized all placeholders to #---_replace# for easier replacement
                 #if you want more info on this go down like 20 lines
-                f"net share {p['name']}='#share_replace#' & REM share_exists", 
+                f'net share {p['name']}="#share_replace#" & REM share_exists', 
                 prereq_required=True, 
                 open_ended_questions=["What path would you like the share to broadcast?"]
             )
@@ -116,25 +116,31 @@ class Commands:
     def program_installed_command(self, p, not_boolean):
         program_list = {
             "Firefox": {
-                "extension": "msi",
-                "latest": r"https://download.mozilla.org/?product=firefox-msi-latest-ssl&os=win64&lang=en-US&attribution_code=c291cmNlPXN1cHBvcnQubW96aWxsYS5vcmcmbWVkaXVtPXJlZmVycmFsJmNhbXBhaWduPShub3Qgc2V0KSZjb250ZW50PShub3Qgc2V0KSZleHBlcmltZW50PShub3Qgc2V0KSZ2YXJpYXRpb249KG5vdCBzZXQpJnVhPWVkZ2UmY2xpZW50X2lkX2dhND01MDEzNzE4NDguMTc0OTAwNDc0MyZzZXNzaW9uX2lkPTc3MjMwNTMyODQmZGxzb3VyY2U9bW96b3Jn&attribution_sig=7ba90acf45f025ea79b153fc3f23cd0c46d921bbcc0dbcf340eb123d007103ae&_gl=1*1w7f5lo*_ga*NTAxMzcxODQ4LjE3NDkwMDQ3NDM.*_ga_MQ7767QQQW*czE3NDkwMDQ3NDMkbzEkZzEkdDE3NDkwMDQ4NzYkajQ3JGwwJGgw",
-                "old": r"https://ftp.mozilla.org/pub/firefox/releases/106.0b3/win64/en-US/Firefox%20Setup%20106.0b3.msi",
-                "old_version": "106.0b3"
+                "new_version": "Mozilla.Firefox",
+                "old_version": "Mozilla.Firefox -v 96.0"
             },
 
             "CCleaner": {
-                "extension": "msi",
-                "latest": r"https://www.ccleaner.com/go/get_ccbe_msi",
-                "old": r"old", #find later
-                "old_version": "test3"
+                "new_version": "Piriform.CCleaner",
+                "old_version": "Piriform.CCleaner"
             },
 
             "Notepad++": {
-                "extension": "msi",
-                "latest": r"new",
-                "old": r"old", #find later
-                "old_version": "test6"
+                "new_version": "Notepad++.Notepad++",
+                "old_version": "Notepad++.Notepad++ -v 7.8.6" 
+            },
+            
+            "Wireshark": {
+                "new_version":"WiresharkFoundation.Wireshark",
+                "old_version":"WiresharkFoundation.Wireshark -v 3.2.2"
+            },
+
+            "Google Chrome": {
+                "new_version": "Google.Chrome",
+                "old_version": "Google.Chrome"
             }
+
+            
         }
         
         for program in program_list.keys():
@@ -144,7 +150,7 @@ class Commands:
                     #also added & REM which allows additional storeage in the command by adding a comment to it
                     #could've added another variable to command class but i thought this was cooler 👍
                     #the reason for this change is that it allows us to dynamically change based on the name bc then we know what program they want and such
-                    f"msiexec /i #{program}_replace# /qn & REM program_installed", 
+                    f"winget install --id #{program}_replace# -e --silent --accept-package-agreements --accept-source-agreements & REM program_installed", 
                     prereq_required=True, 
                     supported_dict=program_list,
                     radio_button_options={

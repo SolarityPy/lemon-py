@@ -57,9 +57,9 @@ class Command:
         if key in self.supported_dict:
             program = self.supported_dict[key]
             if 'Old Version' in answer:
-                return program['old']
+                return program['old_version']
             else:
-                return program['latest']
+                return program['new_version']
         return None
 
     def get_answer(self, answer):

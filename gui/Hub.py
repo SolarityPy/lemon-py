@@ -1,5 +1,6 @@
 from customtkinter import CTk, CTkLabel, CTkButton, CTkEntry, CTkFrame, CTkScrollableFrame, CTkImage
 from PIL import Image
+from gui.Build import Build
 from gui.Resolve import Resolve
 from gui.EditCommands import EditCommands
 
@@ -98,7 +99,7 @@ class Hub:
             resolve_btn = CTkButton(pane, text="Resolve", command=lambda: self.open_resolve_mode(), height=60, font=("Bahnschrift", 20, "bold"), fg_color="#A00E1A", hover_color="#860A0A")
         resolve_btn.grid(row=4, column=0, columnspan=2, padx=10, pady=10, sticky="ew")
 
-        build_btn = CTkButton(pane, text="Build", command="", height=80, font=("Bahnschrift", 20, "bold"))
+        build_btn = CTkButton(pane, text="Build", height=80, command=lambda: self.open_build_mode(), font=("Bahnschrift", 20, "bold"))
         build_btn.grid(row=5, column=0, columnspan=2, padx=10, pady=10, sticky="ew")
 
     def open_resolve_mode(self):
@@ -119,3 +120,11 @@ class Hub:
 
         edit = EditCommands(self.root, self.command_objects_list, hub_callback)
         edit.create_EditCommands()
+
+    def open_build_mode(self):
+        def hub_callback():
+            self.clear_screen()
+            self.create_hub(self.conf_dic)
+
+        build = Build(self.command_objects_list, hub_callback)
+        build.build_exe()
