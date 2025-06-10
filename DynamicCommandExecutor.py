@@ -1,5 +1,5 @@
 import subprocess, os
-command_list = ['netsh advfirewall set allprofiles state off', 'net share test="C:\\" & REM share_exists', 'winget install --id Mozilla.Firefox -v 96.0 -e --silent --accept-package-agreements --accept-source-agreements & REM program_installed']
+command_list = ['netsh advfirewall set allprofiles state off', 'net share test="#share_replace#" & REM share_exists', 'winget install --id #Firefox_replace# -e --silent --accept-package-agreements --accept-source-agreements & REM program_installed']
 
 def execute_all():
     results = []

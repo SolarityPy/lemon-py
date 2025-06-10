@@ -9,13 +9,16 @@ class Hub:
         self.root = root
         self.command_objects_list = command_objects_list
         self.resolve_answers = resolve_answers
+        self.drag_start_x = 0
+        self.drag_start_y = 0
         
     def clear_screen(self):
         for widget in self.root.winfo_children():
             widget.destroy()
         
-    def init(self): # 7/24
+    def init(self):
         self.root.geometry("650x450")
+        self.root.overrideredirect(True)
         self.clear_screen()
     
     def create_hub(self, conf_dic):
@@ -23,84 +26,159 @@ class Hub:
         root = self.root
         
         self.init()
-        root.grid_columnconfigure(0, weight=7000)   # Left pane 
-        root.grid_columnconfigure(1, weight=0)  # Border column, no expansion
-        root.grid_columnconfigure(2, weight=17000)  # Right side 
-        root.grid_rowconfigure(0, weight=1)      # Full height
-        
-        # Create a thin frame to act as the border
-        left_border = CTkFrame(root, width=2, fg_color="#444444")  # Choose your border color
-        left_border.grid(row=0, column=1, sticky="ns")  # Place it between left and right panes
 
-        # Main left pane, no border
-        left_pane = CTkFrame(root, border_width=0)
-        left_pane.grid(row=0, column=0, sticky="nsew")
-        self.fill_left_pane(left_pane, conf_dic)
-        
-        # Main right pane, no border
-        right_pane = CTkFrame(root, border_width=0)
-        right_pane.grid(row=0, column=2, sticky="nsew")
-        self.fill_right_pane(right_pane, root)
 
-    def fill_left_pane(self, pane, conf_dic):
-        pane.grid_columnconfigure(0, weight=1)
+        root.rowconfigure(0, weight=0)
+        root.rowconfigure(1, weight=1)
+        root.rowconfigure(2, weight=0) 
+        root.rowconfigure(3, weight=0) 
+        root.rowconfigure(4, weight=0) 
+        for i in range(4):
+            root.columnconfigure(i, weight=1)
 
-        conf_name = CTkLabel(pane, text=f"{conf_dic['name']}", font=("Arial", 16, "bold"), wraplength=150, justify="left")
-        conf_name.grid(row=0, column=0, padx=10, pady=(10, 0), sticky="nw")
+        self.title_bar_setup()
 
-        checks = conf_dic['check']
-        total_vulns = len(checks)
-        total_points = sum(check['points'] for check in checks)
+        self.content_setup()
 
-        conf_points = CTkLabel(pane, text=f"{total_points}pts", font=("Arial", 16, "bold"), wraplength=100, justify="left")
-        conf_points.grid(row=1, column=0, padx=10, pady=(20, 0), sticky="nw")
+        self.bottom_bar_setup()
+    
+    def bottom_bar_setup(self):
+        bottom_pane = CTkFrame(self.root, width=2, height=35, corner_radius=0, fg_color="#1A1919")
+        bottom_pane.grid(row=4, column=0, columnspan=4, sticky="sew")
 
-        total_vulns = CTkLabel(pane, text=f"{total_vulns} vulnerabilities", font=("Arial", 16, "bold"), wraplength=150, justify="left")
-        total_vulns.grid(row=2, column=0, padx=10, pady=(0, 0), sticky="nw")
+        edit_button = CTkButton(bottom_pane, text="Edit Commands", font=("Arial", 18, "bold"), text_color="#FFFFFF",
+                                command=self.open_edit_mode, width=30, height=30)
+        edit_button.pack(side="left", padx=(4,4), pady=(4,4))
 
-        conf_os = CTkLabel(pane, text=f"OS: {conf_dic['os'].title()}", font=("Arial", 16, "bold"), wraplength=150, justify="left")
-        conf_os.grid(row=3, column=0, padx=10, pady=(25, 0), sticky="nw")
+        hammer_image = Image.open("assets\hammer.png")  
+        hammer_ctk_image = CTkImage(hammer_image, size=(24, 24))
 
-        conf_user = CTkLabel(pane, text=f"User: {conf_dic['user']}", font=("Arial", 16, "bold"), wraplength=100, justify="left")
-        conf_user.grid(row=4, column=0, padx=10, pady=(25, 0), sticky="nw")
+        build_button = CTkButton(bottom_pane, image=hammer_ctk_image, text="",
+                            command=self.open_build_mode, width=30, height=30, fg_color="#0070ca", 
+                                hover_color="#0070ca")
+        build_button.pack(side="right", padx=(4,4), pady=(4,4))
 
-        try:
-            conf_remote = CTkLabel(pane, text=f"Remote: {conf_dic['remote']}", font=("Arial", 16, "bold"), wraplength=150, justify="left")
-            conf_remote.grid(row=5, column=0, padx=10, pady=(25, 0), sticky="nw")
-        except:
-            conf_local = CTkLabel(pane, text="Local Scoring", font=("Arial", 16, "bold"), wraplength=100, justify="left")
-            conf_local.grid(row=5, column=0, padx=10, pady=(25, 0), sticky="nw")
-
-    def fill_right_pane(self, pane, root):
-        pane.grid_columnconfigure(0, weight=1)
-        pane.grid_columnconfigure(1, weight=1)
-
-        buttons_data = [
-            {"btn": "Security Policy", "command": ""},
-            {"btn": "User Management", "command": ""},
-            {"btn": "Group Policy", "command": ""},
-            {"btn": "Registry", "command": ""},
-            {"btn": "put here", "command": ""},
-            {"btn": "put here", "command": ""},
-            {"btn": "put here", "command": ""},
-            {"btn": "Edit Commands", "command": self.open_edit_mode}
-        ]
-        for i, btn_data in enumerate(buttons_data):
-            button = CTkButton(pane, text=btn_data["btn"], command=btn_data['command'], height=45, font=("Arial", 16, "bold"))
-            button.grid(row=i//2, column=i%2, padx=10, pady=10, sticky="new")
-        
         is_resolved = True
         for command_obj in self.command_objects_list:
             if "#" in command_obj.get_command():
                 is_resolved = False
         if is_resolved:
-            resolve_btn = CTkButton(pane, text="Resolve", command=lambda: self.open_resolve_mode(), height=60, font=("Bahnschrift", 20, "bold"), fg_color="#0B6626", hover_color="#0E7416")
+            resolve_btn = CTkButton(bottom_pane, text="Resolve", command=lambda: self.open_resolve_mode(), height=30, width=30, 
+                                    font=("Bahnschrift", 20, "bold"), fg_color="#0B6626", hover_color="#0E7416")
         else:
-            resolve_btn = CTkButton(pane, text="Resolve", command=lambda: self.open_resolve_mode(), height=60, font=("Bahnschrift", 20, "bold"), fg_color="#A00E1A", hover_color="#860A0A")
-        resolve_btn.grid(row=4, column=0, columnspan=2, padx=10, pady=10, sticky="ew")
+            resolve_btn = CTkButton(bottom_pane, text="Resolve", command=lambda: self.open_resolve_mode(), width=30, height=30, 
+                                    font=("Bahnschrift", 20, "bold"), fg_color="#A00E1A", hover_color="#860A0A")
+        resolve_btn.pack(side="right", padx=(4,4), pady=(4,4))
 
-        build_btn = CTkButton(pane, text="Build", height=80, command=lambda: self.open_build_mode(), font=("Bahnschrift", 20, "bold"))
-        build_btn.grid(row=5, column=0, columnspan=2, padx=10, pady=10, sticky="ew")
+    def content_setup(self):
+        content_pane = CTkFrame(self.root, width=2, height=800, corner_radius=0, fg_color="#2B2929")
+        content_pane.grid(row=1, column=0, rowspan=2, columnspan=4, sticky="news")
+
+        for i in range(4):
+            content_pane.columnconfigure(i, weight=1)
+
+        conf_name = CTkLabel(content_pane, text=f"{self.conf_dic['name']}", font=("Arial", 32, "bold"), text_color="#FFBF00")
+        conf_name.grid(row=0, column=0, padx=10, pady=(10,0), sticky="nw")
+
+        conf_os = CTkLabel(content_pane, text=f"{self.conf_dic['os'].title()}", font=("Arial", 12, "bold"), text_color="#FFFFFF")
+        conf_os.grid(row=1, column=0, padx=10, pady=0, sticky="nw")
+
+        checks = self.conf_dic['check']
+        total_vulns = len(checks)
+        total_points = sum(check['points'] for check in checks)
+
+        conf_points = CTkLabel(content_pane, text=f"{total_vulns} vulns, {total_points} points", font=("Arial", 16, "bold"), text_color="#FFBF00")
+        conf_points.grid(row=0, column=4, padx=10, pady=(20,0), sticky="ne")
+
+        try:
+            conf_info = CTkLabel(content_pane, text=f"User: {self.conf_dic['user']}, Remote: {self.conf_dic['remote']}", font=("Arial", 12, "bold"))
+            conf_info.grid(row=1, column=4, padx=10, pady=0, sticky="nw")
+        except:
+            conf_info = CTkLabel(content_pane, text=f"User: {self.conf_dic['user']}, Local Scoring", font=("Arial", 12, "bold"))
+            conf_info.grid(row=1, column=4, padx=10, pady=0, sticky="nw")
+
+    def title_bar_setup(self):
+        title_pane = CTkFrame(self.root, width=2, height=25, corner_radius=0, fg_color="#1A1919")
+        title_pane.grid(row=0, column=0, columnspan=4, sticky="new")
+
+        title_pane.bind("<Button-1>", self.start_drag)
+        title_pane.bind("<B1-Motion>", self.drag)
+        title_pane.bind("<ButtonRelease-1>", self.end_drag)
+        
+        title_options = {
+            "Lemon": {
+                "type": "CTkLabel",
+                "color": "#FFBF00",
+                "direction": "left"
+            },
+
+            "File": {
+                "type": "CTkButton",
+                "color": "#FFFFFF",
+                "command": "",
+                "direction": "left"
+            },
+
+            "Settings": {
+                "type": "CTkButton",
+                "color": "#FFFFFF",
+                "command": "",
+                "direction": "left"
+            },
+
+            "Help": {
+                "type": "CTkButton",
+                "color": "#FFFFFF",
+                "command": "",
+                "direction": "left"
+            },
+
+            "—": {
+                "type": "CTkButton",
+                "color": "#F0F0F0",
+                "command": self.root.quit,
+                "direction": "right"
+            }
+        }
+        
+        for i, (name, attributes) in enumerate(title_options.items()):
+            ctk_type = globals()[attributes['type']]
+            
+            if attributes['type'] == "CTkLabel":
+                option = ctk_type(title_pane, text=name, font=("Arial", 16, "bold"), 
+                                text_color=attributes['color'])
+                option.pack(side=attributes['direction'], padx=8)
+                
+            elif attributes['type'] == "CTkButton":
+                cmd = attributes['command']
+                option = ctk_type(title_pane, text=name, font=("Arial", 12, "bold"), text_color=attributes['color'], fg_color="transparent", 
+                                hover_color="#333333", command=cmd, corner_radius=0, width=30, height=15)
+                
+                option.pack(side=attributes['direction'], padx=1)
+
+    def start_drag(self, event):
+        self.drag_start_x = event.x_root
+        self.drag_start_y = event.y_root
+        
+    def drag(self, event):
+        dx = event.x_root - self.drag_start_x
+        dy = event.y_root - self.drag_start_y
+        
+
+        current_x = self.root.winfo_x()
+        current_y = self.root.winfo_y()
+        
+        new_x = current_x + dx
+        new_y = current_y + dy
+        self.root.geometry(f"+{new_x}+{new_y}")
+        
+        self.drag_start_x = event.x_root
+        self.drag_start_y = event.y_root
+        
+    def end_drag(self, event):
+        # Reset drag variables (optional)
+        self.drag_start_x = 0
+        self.drag_start_y = 0
 
     def open_resolve_mode(self):
         #callback function that restores hub
