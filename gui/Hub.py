@@ -56,7 +56,7 @@ class Hub:
                                 command=self.open_edit_mode, width=30, height=30)
         edit_button.pack(side="left", padx=(4,4), pady=(4,4))
 
-        hammer_image = Image.open("assets\hammer.png")  
+        hammer_image = Image.open(r"assets\hammer.png")  
         hammer_ctk_image = CTkImage(hammer_image, size=(24, 24))
 
         build_button = CTkButton(bottom_pane, image=hammer_ctk_image, text="",
