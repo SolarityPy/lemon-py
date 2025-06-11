@@ -55,15 +55,15 @@ class Hub:
         bottom_pane.grid(row=4, column=0, columnspan=4, sticky="sew")
 
         edit_button = CTkButton(bottom_pane, text="Edit", font=("Arial", 18, "bold"), text_color="#FFFFFF",
-                                command=self.open_edit_mode, width=30, height=30)
+                                command=self.open_edit_mode, width=30, height=30, fg_color="#B58C0E", hover_color="#93720D")
         edit_button.pack(side="left", padx=(4,4), pady=(4,4))
 
         hammer_image = Image.open(r"assets\hammer.png")  
         hammer_ctk_image = CTkImage(hammer_image, size=(24, 24))
 
         build_button = CTkButton(bottom_pane, image=hammer_ctk_image, text="",
-                            command=self.open_build_mode, width=30, height=30, fg_color="#0070ca", 
-                                hover_color="#0070ca")
+                            command=self.open_build_mode, width=30, height=30,
+                                fg_color="#B58C0E", hover_color="#93720D")
         build_button.pack(side="right", padx=(4,4), pady=(4,4))
 
         self.is_resolved = True

@@ -81,9 +81,9 @@ class Resolve:
             nothing_label.place(relx=0.5, rely=0.45, anchor="center")
 
         # Create buttons
-        back_button = CTkButton(self.content_pane, text="Back", height=30, width=120, command=self.decrease_index)
-        escape_button = CTkButton(self.content_pane, text="Escape", height=30, width=120, command=self.resolve_escape)
-        next_button = CTkButton(self.content_pane, text="Next", height=30, width=120, command=self.increase_index)
+        back_button = CTkButton(self.content_pane, text="Back", height=30, width=120, command=self.decrease_index, fg_color="#B58C0E", hover_color="#93720D")
+        escape_button = CTkButton(self.content_pane, text="Escape", height=30, width=120, command=self.resolve_escape, fg_color="#B58C0E", hover_color="#93720D")
+        next_button = CTkButton(self.content_pane, text="Next", height=30, width=120, command=self.increase_index, fg_color="#B58C0E", hover_color="#93720D")
         
         # Show appropriate buttons
         if self.index > 1:
