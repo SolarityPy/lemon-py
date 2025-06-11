@@ -23,20 +23,32 @@ class Resolve:
     def update_screen(self):
         self.clear_screen()
 
+        # Configure the root grid properly
+        self.root.rowconfigure(0, weight=0)  # Title bar
+        self.root.rowconfigure(1, weight=1)  # Content pane
+        self.root.rowconfigure(2, weight=0)
+        
+        for i in range(4):
+            self.root.columnconfigure(i, weight=1)
+
         title = Title(self.root)
         title.title_bar_setup()
+        
+        # Content pane should expand to fill available space
+        self.content_pane = CTkFrame(self.root, corner_radius=0, height=800, fg_color="#2B2929")
+        self.content_pane.grid(row=1, column=0, rowspan=5, columnspan=4, sticky="nsew")
 
+        # Configure content_pane internal grid
+        for i in range(5):
+            self.content_pane.rowconfigure(i, weight=1)
+        for i in range(4):
+            self.content_pane.columnconfigure(i, weight=1)
+        
         try:
             question_dict = self.question_formatted_list[self.index - 1]
             
-            # Configure grid once
-            for i in range(3):
-                self.root.grid_columnconfigure(i, weight=1)
-            for i in range(5):
-                self.root.grid_rowconfigure(i, weight=1)
-            
             if question_dict['type'] == "radio_options":
-                label = CTkLabel(self.root, text=question_dict['question'])
+                label = CTkLabel(self.content_pane, text=question_dict['question'])
                 label.grid(row=0, column=0, columnspan=3, pady=20, sticky="n")
                 # Restore previous answer if exists
                 if self.index in self.user_answers:
@@ -46,7 +58,7 @@ class Resolve:
                 
                 for i, option in enumerate(question_dict['options']):
                     radio_btn = CTkRadioButton(
-                        self.root,
+                        self.content_pane,
                         text=option,
                         variable=self.radio_var,
                         value=option
@@ -54,10 +66,10 @@ class Resolve:
                     radio_btn.grid(row=i+1, column=1, pady=5, padx=20, sticky="nswe")
             elif question_dict['type'] == "open_ended":
                 for question in question_dict['questions']:
-                    label = CTkLabel(self.root, text=question)
+                    label = CTkLabel(self.content_pane, text=question)
                     label.grid(row=0, column=0, columnspan=3, pady=20, sticky="new")
                     
-                    self.current_entry = CTkEntry(self.root, width=300, height=30)
+                    self.current_entry = CTkEntry(self.content_pane, width=300, height=30)
                     self.current_entry.grid(row=1, column=1, pady=10, padx=20, sticky="ew")
 
                     #saves answer for later resoration
@@ -65,13 +77,13 @@ class Resolve:
                         self.current_entry.insert(0, self.user_answers[self.index])
         except:
             #accounts for case where user has nothing to resolve i.e. no user input needed
-            nothing_label = CTkLabel(self.root, text="*You have nothing to resolve*", font=("Arial", 25, "bold"))
+            nothing_label = CTkLabel(self.content_pane, text="*You have nothing to resolve*", font=("Arial", 25, "bold"))
             nothing_label.place(relx=0.5, rely=0.45, anchor="center")
 
         # Create buttons
-        back_button = CTkButton(self.root, text="Back", height=30, width=120, command=self.decrease_index)
-        escape_button = CTkButton(self.root, text="Escape", height=30, width=120, command=self.resolve_escape)
-        next_button = CTkButton(self.root, text="Next", height=30, width=120, command=self.increase_index)
+        back_button = CTkButton(self.content_pane, text="Back", height=30, width=120, command=self.decrease_index)
+        escape_button = CTkButton(self.content_pane, text="Escape", height=30, width=120, command=self.resolve_escape)
+        next_button = CTkButton(self.content_pane, text="Next", height=30, width=120, command=self.increase_index)
         
         # Show appropriate buttons
         if self.index > 1:
@@ -85,8 +97,16 @@ class Resolve:
             escape_button.grid(row=4, column=2, padx=(20,0), pady=10, sticky="se")
 
     def init(self): 
-        self.root.geometry("600x450")
+        root = self.root
+        root.geometry("650x450")
         self.clear_screen()
+        
+        for i in range(4):
+            root.rowconfigure(i, weight=1)
+
+        for i in range(4): 
+            root.columnconfigure(i, weight=1)
+
         
     def increase_index(self):
         self.save_current_answer()
@@ -104,13 +124,12 @@ class Resolve:
         root = self.root
         self.init()
 
-        # Configure grid for centering - 3 columns
         for i in range(3):
             root.grid_columnconfigure(i, weight=1)
-        for i in range(5):  # Increased rows for radio buttons
+        for i in range(5):
             root.grid_rowconfigure(i, weight=1)
 
-        self.update_screen()  # This will now create everything including buttons
+        self.update_screen()
 
     def resolve_escape(self):
         try:
