@@ -120,7 +120,7 @@ class Hub:
                 "direction": "left",
                 "dropdown": {
                     "Open Configuration": {
-                        "command": "pass"
+                        "command": lambda: print("Open configuration pressed!")
                     },
 
                     "Save Config": {
@@ -181,10 +181,9 @@ class Hub:
 
     def create_dropdown(self, option, attributes):
         dropdown_menu = tk.Menu(self.root, tearoff=0)
-        print(attributes.keys())
         if 'dropdown' in attributes.keys():
             for options in attributes['dropdown']:
-                dropdown_menu.add_command(label=options)
+                dropdown_menu.add_command(label=options, command=attributes['dropdown'][options]['command'])
         
         #dropdown_frame.grid(row=y_position+1, column=x_position)
         x = option.winfo_rootx() + (self.root.winfo_width() // 11)
