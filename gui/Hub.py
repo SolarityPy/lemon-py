@@ -1,7 +1,9 @@
-from customtkinter import CTk, CTkLabel, CTkButton, CTkEntry, CTkFrame, CTkScrollableFrame, CTkImage
+from customtkinter import CTk, CTkLabel, CTkButton, CTkEntry, CTkFrame, CTkScrollableFrame, CTkImage, CTkOptionMenu
+import tkinter as tk
 from PIL import Image
 from gui.Build import Build
 from gui.Resolve import Resolve
+from functools import partial
 from gui.EditCommands import EditCommands
 
 class Hub:
@@ -115,22 +117,39 @@ class Hub:
             "File": {
                 "type": "CTkButton",
                 "color": "#FFFFFF",
-                "command": "",
-                "direction": "left"
+                "direction": "left",
+                "dropdown": {
+                    "Open Configuration": {
+                        "command": "pass"
+                    },
+
+                    "Save Config": {
+                        "command": "pass" # do later
+                    }
+                }
             },
 
             "Settings": {
                 "type": "CTkButton",
                 "color": "#FFFFFF",
-                "command": "",
-                "direction": "left"
+                "direction": "left",
+                "dropdown": {
+                    "placeholder": {
+                        "command": "placeholder"
+                    }
+                }
             },
 
             "Help": {
                 "type": "CTkButton",
                 "color": "#FFFFFF",
                 "command": "",
-                "direction": "left"
+                "direction": "left",
+                "dropdown": {
+                    "placeholder": {
+                        "command": "placeholder"
+                    }
+                }
             },
 
             "—": {
@@ -150,11 +169,33 @@ class Hub:
                 option.pack(side=attributes['direction'], padx=8)
                 
             elif attributes['type'] == "CTkButton":
-                cmd = attributes['command']
-                option = ctk_type(title_pane, text=name, font=("Arial", 12, "bold"), text_color=attributes['color'], fg_color="transparent", 
-                                hover_color="#333333", command=cmd, corner_radius=0, width=30, height=15)
+                if "dropdown" in attributes:
+                    option = ctk_type(title_pane, text=name, font=("Arial", 12, "bold"), text_color=attributes['color'], fg_color="transparent", 
+                                hover_color="#333333", command=partial(self.create_dropdown, option, attributes), corner_radius=0, width=30, height=15)
+                else:
+                    option = ctk_type(title_pane, text=name, font=("Arial", 12, "bold"), text_color=attributes['color'], fg_color="transparent", 
+                                hover_color="#333333", command=attributes.get('command', ''), corner_radius=0, width=30, height=15)
+                
                 
                 option.pack(side=attributes['direction'], padx=1)
+
+    def create_dropdown(self, option, attributes):
+        dropdown_menu = tk.Menu(self.root, tearoff=0)
+        print(attributes.keys())
+        if 'dropdown' in attributes.keys():
+            for options in attributes['dropdown']:
+                dropdown_menu.add_command(label=options)
+        
+        #dropdown_frame.grid(row=y_position+1, column=x_position)
+        x = option.winfo_rootx() + (self.root.winfo_width() // 11)
+        # "to lemon or not to lemon"
+        #               - Rishabh
+
+        y = option.winfo_rooty() + option.winfo_height()
+
+        # Post the menu at that position
+        dropdown_menu.tk_popup(x, y)
+        
 
     def start_drag(self, event):
         self.drag_start_x = event.x_root
