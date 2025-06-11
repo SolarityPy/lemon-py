@@ -6,6 +6,7 @@ from ConfigParser import ConfigParser
 from PIL import Image
 from gui.Build import Build
 from gui.Resolve import Resolve
+from tkinter import messagebox
 from functools import partial
 from gui.EditCommands import EditCommands
 
@@ -63,11 +64,11 @@ class Hub:
                                 hover_color="#0070ca")
         build_button.pack(side="right", padx=(4,4), pady=(4,4))
 
-        is_resolved = True
+        self.is_resolved = True
         for command_obj in self.command_objects_list:
             if "#" in command_obj.get_command():
-                is_resolved = False
-        if is_resolved:
+                self.is_resolved = False
+        if self.is_resolved:
             resolve_btn = CTkButton(bottom_pane, text="Resolve", command=lambda: self.open_resolve_mode(), height=30, width=30, 
                                     font=("Bahnschrift", 20, "bold"), fg_color="#0B6626", hover_color="#0E7416")
         else:
@@ -258,6 +259,7 @@ class Hub:
         # Pass this callback to Resolve
         resolve = Resolve(self.root, self.command_objects_list, hub_callback, self.resolve_answers)
         resolve.resolve()
+        
 
     def open_edit_mode(self):
         def hub_callback():
@@ -271,6 +273,8 @@ class Hub:
         def hub_callback():
             self.clear_screen()
             self.create_hub(self.conf_dic)
-
+        if not self.is_resolved:
+            messagebox.showerror(title="Cannot Build", message="Please resolve all commands before building!")
+            return
         build = Build(self.command_objects_list, hub_callback)
         build.build_exe()
