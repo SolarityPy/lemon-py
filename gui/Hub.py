@@ -1,5 +1,8 @@
 from customtkinter import CTk, CTkLabel, CTkButton, CTkEntry, CTkFrame, CTkScrollableFrame, CTkImage, CTkOptionMenu
 import tkinter as tk
+from tkinter import filedialog
+from Translator import Translator
+from ConfigParser import ConfigParser
 from PIL import Image
 from gui.Build import Build
 from gui.Resolve import Resolve
@@ -98,6 +101,31 @@ class Hub:
         except:
             conf_info = CTkLabel(content_pane, text=f"User: {self.conf_dic['user']}, Local Scoring", font=("Arial", 12, "bold"))
             conf_info.grid(row=1, column=4, padx=10, pady=0, sticky="nw")
+        
+    def open_button_handler(self):
+        # Limits the extensions to .conf, .txt, and .toml
+        file_path = filedialog.askopenfilename(
+            filetypes=[("Config files", "*.conf"), ("Text files", "*.txt"), ("TOML files", "*.toml")]
+        )
+        if file_path:
+            self.start_screen(file_path)
+            #could add alert if not correct file path
+
+    def start_screen(self, file_path):
+        config = ConfigParser(file_path)
+        config_dictionary = config.parse()
+        # Force window update before creating hub
+        self.root.update_idletasks()
+        
+        translator_object = Translator(config_dictionary, self)
+        command_objects_list = translator_object.translate()
+                    
+        # Iterate through all Command objects and pass in any required questions to the hub
+        
+        self.create_hub(config_dictionary)
+        
+        # Force layout recalculation
+        self.root.update_idletasks()
 
     def title_bar_setup(self):
         title_pane = CTkFrame(self.root, width=2, height=25, corner_radius=0, fg_color="#1A1919")
@@ -120,7 +148,7 @@ class Hub:
                 "direction": "left",
                 "dropdown": {
                     "Open Configuration": {
-                        "command": lambda: print("Open configuration pressed!")
+                        "command": lambda: self.open_button_handler()
                     },
 
                     "Save Config": {

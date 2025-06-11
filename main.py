@@ -33,7 +33,10 @@ class App(ctk.CTk):
         config = ConfigParser(file_path)
         config_dictionary = config.parse()
         # Force window update before creating hub
-        self.update_idletasks()
+        try:
+            self.root.update_idletasks()
+        except:
+            self.update_idletasks()
         
         translator_object = Translator(config_dictionary, self)
         command_objects_list = translator_object.translate()
