@@ -1,5 +1,6 @@
 from customtkinter import CTk, CTkLabel, CTkButton, CTkEntry, CTkFrame, CTkScrollableFrame, CTkImage, CTkRadioButton
 import tkinter as tk
+from gui.title import Title
 class Resolve:
     def __init__(self, root, command_obj_list, hub_callback=None, user_answers=None):
         self.root = root
@@ -21,6 +22,10 @@ class Resolve:
             
     def update_screen(self):
         self.clear_screen()
+
+        title = Title(self.root)
+        title.title_bar_setup()
+
         try:
             question_dict = self.question_formatted_list[self.index - 1]
             
