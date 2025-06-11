@@ -10,6 +10,7 @@ class App(ctk.CTk):
         super().__init__()
         self.geometry("200x125")
         self.title("Lemon")
+        self.iconbitmap("assets/lemon.ico")
         
         # Gives the columns more "weight", spacing them out (kind of like an HBox?)
         for i in range(4):
