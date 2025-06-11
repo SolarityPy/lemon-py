@@ -54,7 +54,7 @@ class Hub:
         bottom_pane = CTkFrame(self.root, width=2, height=35, corner_radius=0, fg_color="#1A1919")
         bottom_pane.grid(row=4, column=0, columnspan=4, sticky="sew")
 
-        edit_button = CTkButton(bottom_pane, text="Edit Commands", font=("Arial", 18, "bold"), text_color="#FFFFFF",
+        edit_button = CTkButton(bottom_pane, text="Edit", font=("Arial", 18, "bold"), text_color="#FFFFFF",
                                 command=self.open_edit_mode, width=30, height=30)
         edit_button.pack(side="left", padx=(4,4), pady=(4,4))
 

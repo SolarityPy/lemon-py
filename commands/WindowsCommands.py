@@ -167,3 +167,9 @@ class Commands:
                 )
         
         return None
+
+    def security_policy_command(self, p, not_boolean):
+        pass
+
+        
+    
