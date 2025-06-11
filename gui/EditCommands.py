@@ -1,5 +1,6 @@
 from customtkinter import CTk, CTkLabel, CTkButton, CTkEntry, CTkFrame, CTkScrollableFrame, CTkImage, CTkTextbox
 from functools import partial
+from gui.title import Title
 import tkinter.font as tkFont
 
 class EditCommands:
@@ -16,12 +17,26 @@ class EditCommands:
     def init(self):
         self.root.geometry("650x450")
         self.clear_screen()
-        self.scroll_frame = CTkScrollableFrame(self.root, width=650, height=450)
-        self.scroll_frame.grid(row=0, column=0, sticky="nsew")
+        # The scroll frame should start at row 1, not row 0 (title bar is at row 0)
+        self.scroll_frame = CTkScrollableFrame(self.root, width=650, height=400)
+        self.scroll_frame.grid(row=1, column=0, columnspan=4, sticky="nsew")  # Changed to row 1
 
     def create_EditCommands(self, editing_command=None):
         self.init()
-        #scroll bar
+
+        # Configure the root grid properly
+        self.root.rowconfigure(0, weight=0)  # Title bar
+        self.root.rowconfigure(1, weight=1)  # Content pane (scroll frame)
+        self.root.rowconfigure(2, weight=0)
+        
+        # Uncomment this to fix column spacing
+        for i in range(4):
+            self.root.columnconfigure(i, weight=1)
+
+        title = Title(self.root)
+        title.title_bar_setup()
+        
+        # Configure scroll frame columns
         self.scroll_frame.columnconfigure(0, weight=1)
         self.scroll_frame.columnconfigure(1, weight=1)
         #tells user that they can change the placeholders in resolve - it prob wont break even if they do change bc command remembers the old command
@@ -55,7 +70,7 @@ class EditCommands:
                 #partial is like lambda but it avoids problem where it only edits the last command bc it doesn't remeber anything past the last command
                 finish_btn = CTkButton(self.scroll_frame, text="Finish", 
                     command=partial(self.finish_command, command), 
-                    height=30, width=50, font=("Arial", 16, "bold"), fg_color="#191970", border_width=2)
+                    height=30, width=50, font=("Arial", 16, "bold"), fg_color="#B58C0E", hover_color="#93720D", border_width=2)
                 finish_btn.grid(row=i+1, column=0, padx=10, pady=5, sticky="we")
             else:
                 command_text = CTkLabel(self.scroll_frame, text=f"Command:", font=("Arial", 16))
@@ -67,26 +82,22 @@ class EditCommands:
             #had to use this library bc when using lambda it calls the final value from the loop
                 edit_btn = CTkButton(self.scroll_frame, text="Edit", 
                         command=partial(self.edit_command, command.get_command()), 
-                        height=30, width=50, font=("Arial", 16, "bold"))
+                        height=30, width=50, font=("Arial", 16, "bold"), fg_color="#B58C0E", hover_color="#93720D")
                 edit_btn.grid(row=i+1, column=0, padx=10, pady=5, sticky="we")
 
             delete_btn = CTkButton(self.scroll_frame, text="Delete", 
                     command=partial(self.delete_command, command.get_command()), 
-                    height=30, width=50, font=("Arial", 16, "bold"))
+                    height=30, width=50, font=("Arial", 16, "bold"), fg_color="#B58C0E", hover_color="#93720D")
             delete_btn.grid(row=i+1, column=1, padx=10, pady=5, sticky="we")
             
             i += 2
         #luckaly if you just don't put a row it will just put it at the next avaliable one so this one can always be at the bottom
-        escape_btn = CTkButton(self.scroll_frame, text="Escape", command=self.escape_edit, height=30, width=70, font=("Arial", 16, "bold"))
+        escape_btn = CTkButton(self.scroll_frame, text="Escape", command=self.escape_edit, height=30, width=70, font=("Arial", 16, "bold"), fg_color="#B58C0E", hover_color="#93720D")
         escape_btn.grid(column=0, columnspan=2, padx=10, pady=10, sticky="wes")
 
 
     def escape_edit(self):
         #just prints the commands to terminal and goes back to hub
-        print("=== UPDATED COMMANDS AFTER EDITS ===")
-        for i, command_obj in enumerate(self.command_object_list):
-            print(f"Command {i+1}: {command_obj.get_command()}")
-        print()
         self.hub_callback()
 
     def edit_command(self, edit_command):
